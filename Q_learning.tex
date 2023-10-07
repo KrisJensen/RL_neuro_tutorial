@@ -1,0 +1,44 @@
+\section{Q-learning}
+\label{sec:q_learning}
+
+An alternative approach for learning and action selection when we don't know the transition structure of the world is to learn the value of taking action $a$ in state $s$ instead of only learning the value of the state.
+This gives rise to `Q-learning' methods, where we learn the \emph{state-action values}
+\begin{equation}
+    \label{eq:Q-values}
+    Q_\pi(s,a) =  \mathbb{E}_{a \sim \pi} \left [ \sum_{t=0} r_t | s_{t=0} = s, a_{t=0} = a \right ].
+\end{equation}
+Given these state-action values, it is simple to perform action selection by performing the action with the highest expected value in a given state,
+\begin{equation}
+    a^*(s) = \text{argmax}_{a} Q(s, a).
+\end{equation}
+To learn this optimal policy, we start by expanding \Cref{eq:Q-values},
+\begin{equation}
+    \label{eq:Q-expanded}
+    Q_\pi(s_t,a_t) =  r_t + \sum_{s_{t+1}} p(s_{t+1} | s_t, a_t) \sum_{a_{t+1}} \pi(a_{t+1} | s_{t+1}) Q(s_{t+1}, a_{t+1}).
+\end{equation}
+For the \emph{optimal} policy $\pi^*(s) := \delta(a, a^*(s))$, this gives rise to a self-consistency expression for the optimal state-action values:
+\begin{equation}
+    \label{eq:Q-optimal}
+    Q_{\pi^*}(s_t,a_t) =  r_t + \sum_{s_{t+1}} p(s_{t+1} | s_t, a_t) \text{argmax}_{a_{t+1}} Q_{\pi^*}(s_{t+1}, a_{t+1}).
+\end{equation}
+We can again use this self-consistency expression as a loss function by defining
+\begin{equation}
+    \mathcal{L} \propto \left (  Q(s_t,a_t) - (r_t + \sum_{s_{t+1}} p(s_{t+1} | s_t, a_t) \text{argmax}_{a_{t+1}} Q(s_{t+1}, a_{t+1})) \right )^2,
+\end{equation}
+Gradient descent w.r.t $V_\pi(s_t)$ gives us an update rule
+\begin{align}
+    \Delta  Q(s_t,a_t) & \propto - \frac{\mathcal{L}}{\partial  Q(s_t,a_t)}\\
+    &\propto Q(s_t,a_t) - (r_t + \sum_{s_{t+1}} p(s_{t+1} | s_t, a_t) \text{argmax}_{a_{t+1}} Q(s_{t+1}, a_{t+1}))\\
+    &\approx Q(s_t,a_t) - (r_t + \text{argmax}_{a_{t+1}} Q(s_{t+1}, a_{t+1})).
+\end{align}
+This is the so-called Q-learning update rule \citep{watkins1989learning}, where we have again estimated the expectation over next states with the single sample actually seen by the agent.
+
+In Q-learning, following the greedy policy $a(s) = \text{argmax}_{a} Q(s, a)$ before convergence of the Q values can lead to poor performance due a lack of exploration.
+It is therefore common to either use an `$\epsilon$-greedy' policy, $\pi(a|s) = \epsilon / |\mathcal{A}| + (1-\epsilon) \delta(a, \text{argmax}_{a} Q(s, a))$, or a softmax-policy $\pi(a|s) \propto \text{exp}(\beta Q(a, s)$.
+This approach gives rise to a so-called `off-policy' algorithms, since the policy used in the learning update (the greedy policy) is different from the policy used for action selection (the stochastic policy).
+An on-policy version of Q-learning known as `SARSA' (state-action-reward-state-action) is also commonly used, where the Q-learning update uses the Q-value for the sampled action instead of the greedy action:
+\begin{align}
+    \Delta  Q(s_t,a_t) \propto Q(s_t,a_t) - (r_t + Q(s_{t+1}, a_{t+1})).
+\end{align}
+Both Q-learning and SARSA are guaranteed to converge to the true Q-values in the limit of infinitesimal learning rates and infinite sampling of the state-action space \citep{watkins1992q,sutton2018reinforcement}.
+

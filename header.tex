@@ -1,0 +1,42 @@
+
+\usepackage{graphicx} % Required for inserting images
+\usepackage[compress]{natbib}
+\usepackage[resetlabels]{multibib}
+
+\usepackage{url}            % simple URL typesetting
+\usepackage{float}
+\usepackage[table]{xcolor}
+\definecolor{dred}{rgb}{0.6,0,0}
+\definecolor{dpurple}{HTML}{A020F0}
+\definecolor{dblue}{rgb}{0,0,0.6}
+\definecolor{hlcolor}{rgb}{1,1,0.8}
+
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{amsmath,amssymb,bm}
+\usepackage{multicol}
+\usepackage{lineno}
+\usepackage{authblk}
+
+\usepackage[colorlinks=true, linkcolor=dblue, citecolor=dred]{hyperref}       % hyperlinks
+
+\usepackage[nameinlink]{cleveref}
+\usepackage[margin=1in]{geometry}
+\Crefname{equation}{Equation}{Equations}
+\Crefname{figure}{Figure}{Figures}
+\creflabelformat{equation}{#2#1#3}
+\crefrangelabelformat{equation}{#3#1#4-#5#2#6}
+\renewcommand\b\bm
+\setlength{\parindent}{0pt}
+\setlength{\parskip  }{5.5pt}
+\setlength\columnsep{30pt}
+\setlength\footnotesep{15pt}
+
+\title{An introduction to reinforcement learning for neuroscience \vspace{0.5em}}
+
+\author[1,2]{\normalsize \bfseries Kristopher T.\ Jensen}
+\affil[1]{ \small Sainsbury Wellcome Centre, University College London}
+\affil[2]{ \small Computational and Biological Learning Lab, University of Cambridge}
+\date{\vspace*{-1.5em}
+\normalsize kristopher.torp@gmail.com
+}

@@ -1,0 +1,160 @@
+\section{Deep reinforcement learning}
+\label{sec:deep_RL}
+
+So far, we have considered the setting of finite state- and action-spaces, for which we can simply learn a tabular policy.
+However, in many realistic settings, the state space is large enough that we cannot possibly enumerate all possible states and actions.
+In these cases, we instead have to rely on \emph{function approximation} \citep{sutton2018reinforcement}.
+This approach makes the assumption that similar states will also be associated with similar state-action value functions and should therefore have similar policies.
+By making this assumption, we can generalize to unseen states based on our previous experience, provided that our function approximator is sufficiently good.
+Recent years has seen incredible progress being made in this respect by using deep or recurrent neural networks as powerful function approximators for reinforcement learning -- the domain of `deep reinforcement learning'.
+This approach has seen an increase in interest not just in the machine learning literature, but recently also as a model of neural dynamics and behaviour in humans and other animals \citep{wang2018prefrontal, jensen2023recurrent, makino2023arithmetic, merel2019deep, banino2018vector}.
+For a more comprehensive overview of the links between deep RL and neuroscience, we refer the interested reader to \citep{botvinick2020deep}.
+Modern approaches in deep RL can largely be divided into two categories: policy gradient methods and deep Q learning.
+In policy gradient methods, we directly train the network to output a policy, whereas deep Q networks (DQNs) output a set of state-action values which are then used for action selection.
+
+\subsubsection*{Policy gradient methods}
+
+The conceptually simplest approach for deep reinforcement learning relies on the so-called policy gradient methods \citep{sutton2018reinforcement}.
+In this approach, we train a neural network with parameters $\theta$ to take as input the (observable) state of the environment and directly output a policy $\pi_\theta$.
+Our goal is then to find the setting of $\theta$ that maximizes the expected reward in \Cref{eq:bg_rl_obj}.
+A conceptually simple way to achieve this would be to use gradient descent with gradients given by
+\begin{align}
+    \nabla_\theta J(\theta) &= \nabla_\theta \mathbb{E}_{\tau \sim \pi_\theta} \left [ R_\tau \right ]\\
+    &= \sum_{\tau} R_\tau \nabla_\theta p_\theta(\tau).
+\end{align}
+However, this requires differentiating through the environment, which we may not be able to do.
+Instead, we use the `log-derivative trick', which takes advantage of the linearity of the expectation and the identity $\nabla_\theta \log f(\theta) = f(\theta)^{-1} \nabla_\theta f(\theta)$ to write
+\begin{align}
+    \nabla_\theta J(\theta) & = \sum_\tau R_\tau \nabla_\theta p_\theta(\tau) \\
+                            & = \sum_\tau R_\tau p_\theta(\tau) \nabla_\theta \log p_\theta(\tau) \\
+                            & = \mathbb{E}_{\tau \sim \pi_\theta} \left [ R_\tau \nabla_\theta \log p_\theta(\tau) \right ],
+\end{align}
+Since the environment does not depend on $\theta$, we can simplify the calculation of $\nabla_\theta \log p_\theta (\tau)$:
+\begin{align}
+    \nabla_\theta \log p_\theta(\tau) & = \nabla_\theta \left [ \log p(s_0) + \sum_{t=0}^T \log p(s_{t+1} | s_t, a_t) + \log \pi_\theta (a_t|s_t) \right ] \\
+                                      & = \sum_{t=0}^T \nabla_\theta \log \pi_\theta (a_t|s_t).
+\end{align}
+Inserting this in the expression for $\nabla_\theta J(\theta)$ and taking a Monte Carlo estimate of the expectation gives rise to the REINFORCE algorithm \citep{williams1992simple}:
+\begin{align}
+    \nabla_\theta J(\theta) & = \mathbb{E}_{\tau \sim \pi_\theta} \left [ R_\tau \sum_{t=0}^T \nabla_\theta \log \pi_\theta (a_t|s_t) \right ]                                         \\
+                            & \approx \frac{1}{N} \sum_{\tau \sim \pi_\theta} \left ( \sum_{t=0}^T r_t \right ) \left ( \sum_{t=0}^T \nabla_\theta \log \pi_\theta (a_t|s_t) \right ).
+\end{align}
+
+While the REINFORCE algorithm is unbiased, it also has high variance, which can make learning slow and unstable.
+It is therefore common to introduce modifications, which can help reduce the variance.
+The first of these comes from noting that an action taken at time $t$ cannot affect the reward received at times $t'<t$.
+This allows us to define $R_t := \sum_{t'=t}^T r_{t'}$ and rewrite our REINFORCE update as
+\begin{equation}
+    \nabla_\theta J(\theta) \approx \frac{1}{N} \sum_{\tau \sim \pi_\theta}  \sum_{t=0}^T R_t \nabla_\theta \log \pi_\theta (a_t|s_t).
+\end{equation}
+
+It is also straightforward to show that for a baseline $B(s_t)$ that does not depend on $a_t$,
+\begin{align}
+    \mathbb{E}_{\tau \sim \pi_\theta} \left [ B(s_t) \nabla_\theta \log \pi_\theta (a_t|s_t) \right ]
+     & = \int_{s_t} B(s_t) p(s_t) \left [ \nabla_\theta \int_{a_t} \pi_\theta (a_t|s_t) da_t \right ] ds_t \\
+     & = \int_{s_t} B(s_t) p(s_t) \left [ \nabla_\theta 1 \right ] ds_t = 0.
+\end{align}
+A corollary of this result is that we can subtract such a baseline from our empirical reward and still have an unbiased estimator while reducing its variance.
+A common choice here is the expected future reward
+\begin{equation}
+    V(s_t) = \mathbb{E} \left [ \sum_{t' = t}^T r_t | s_t \right ]
+\end{equation}
+This gives rise to the so-called `actor-critic' algorithm
+\begin{equation}
+    \nabla_\theta J(\theta) \approx \frac{1}{N} \sum_{\tau \sim \pi_\theta}  \sum_{t=0}^T (R_t - V(s_t)) \nabla_\theta \log \pi_\theta (a_t|s_t).
+\end{equation}
+
+Finally, it is common to reduce the variance of our gradient estimator through an approach known as `bootstrapping'.
+To implement this, we note that
+\begin{equation}
+    \mathbb{E} \left [ R_t \right ] = \mathbb{E}[r_t + V(s_{t+1})],
+\end{equation}
+with the right-hand side having lower variance than the left-hand side.
+We can thus use $r_t + V(s_{t+1})$ as an estimate of $R_t$ to define the `advantage function' $A_t = r_t + V(s_{t+1}) - V(s_t)$, which gives rise to the `advantage actor critic' (A2C) algorithm:
+\begin{equation}
+    \nabla_\theta J(\theta) \approx \frac{1}{N} \sum_{\tau \sim \pi_\theta}  \sum_{t=0}^T (r_t + V(s_{t+1}) - V(s_t)) \nabla_\theta \log \pi_\theta (a_t|s_t).
+\end{equation}
+While we have considered two extreme cases of a full Monte-Carlo sample of $R_t$ and a `one-step' bootstrap, the sum in $R_t$ can be truncated to any order with $R_{t'}$ replaced by $V(s_{t'})$.
+In theory this estimator remains unbiased if our value function is unbiased -- however, in practice the estimate of $V(s_t)$ learned by our critic will be inexact, which introduces a bias to our parameter updates.
+The bootstrapping procedure outlined above thus leads to a tradeoff between the bias and variance of our update step, and the optimal tradeoff will depend on the problem setting, network architecture, and training paradigm being used.
+
+For the A2C algorithm outlined above, it is common to parameterize both the policy $\pi_\theta(a_t|s_t)$ and the value function $V_\phi(s_t)$ with neural networks -- often with a subset of shared parameters between $\theta$ and $\phi$.
+This leaves the problem of updating the parameters.
+In order to use out-of-the-box automatic differentiation software, we do this by defining an auxiliary utility (i.e. negative loss)
+\begin{equation}
+    \tilde{J}(\theta) = \frac{1}{N} \sum_{\tau \sim \pi_\theta}  \sum_{t=0}^T (r_t + V(s_{t+1}) - V(s_t)) \log \pi_\theta (a_t|s_t),
+\end{equation}
+where $r_t$ and $V(s_t)$ are constant w.r.t. $\theta$.
+While $\tilde{J}(\theta)$ has no intrinsic interpretation, it is chosen such that
+\begin{equation}
+    \nabla_\theta \tilde{J}(\theta) = \nabla_\theta J(\theta).
+\end{equation}
+Importantly, we no longer have to differentiate through the environment -- only the policy.
+
+The gradient w.r.t. the value function loss is given by
+\begin{equation}
+    \nabla_\phi \mathcal{L}_V = \nabla_\phi \sum_t \frac12  (V_\phi(s_t) - R_t)^2 = \sum_t (V_\phi(s_t) - R_t) \nabla_\phi (V_\phi(s_t).
+\end{equation}
+When $\pi_\theta$ and $V_\phi$ share parameters, we also need to balance these the gradients w.r.t. $\theta$ and $\phi$ in our update step.
+We do this by defining $\delta_t = R_t - V(s_t)$, where $R_t$ can optionally be the bootstrapped estimate $r_t + V(s_{t+1})$, introducing a hyperparameter $\beta_V$, and maximizing the utility
+\begin{equation}
+    \mathcal{L} = \frac{1}{N} \sum_{\tau \sim \pi_\theta} \sum_{t=0}^T ( \log \pi_\theta (a_t|s_t) + \beta_V V(s_t) ) \delta_t .
+\end{equation}
+Importantly, we do not propagate gradients w.r.t. $\phi$ through the computation of $\delta_t$.
+
+While these policy gradient methods may seem far removed from neuroscience, they have recently attracted significant interest as models of learning and neural dynamics in the biological brain \citep{wang2018prefrontal, jensen2023recurrent, merel2019deep}.
+Of particular interest, \citet{wang2018prefrontal} suggested that frontal cortex can be well described as a \emph{recurrent} deep RL agent, where the RNN parameters are configured by learning from rewards over long periods of time from many tasks that have a shared underlying structure.
+Importantly, this `slow' model-free learning process gives rise to an agent that can rapidly learn from experience with \emph{fixed parameters} when exposed to a new task from the same distribution.
+This is achieved by the agent learning to effectively implement a fast RL-like algorithm in the \emph{dynamics} of the network.
+This process whereby an agent trained slowly on a large distribution of tasks can rapidly adapt to a new task is known as `meta-reinforcement learning' and is a popular area of research in machine learning \citep{finn2017model, ritter2018been, duan2016rl, wang2016learning}.
+Recently, \citet{jensen2023recurrent} also extended the work of \citet{wang2018prefrontal} to allow the meta-RL dynamics to learn not just from physical experience but also from imagined experience using a learned model of the environment.
+
+\subsubsection*{Deep Q-learning}
+
+While the policy gradient methods discussed above are useful, they have a couple of shortcomings.
+One is that most policy-gradient methods are fundamentally `on-policy', which means that the data used for learning must be sampled from the agent itself.
+This is necessary for the log derivative trick to work.
+Another is that the gradient can have fairly high variance despite all of our variance reduction efforts.
+We can begin to tackle both of these shortcomings using a method known as `deep Q-learning'.
+To do so, we first note that our actor critic algorithm above required us to estimate the value function $V_\theta(s_t)$.
+However, as we saw in \Cref{eq:value_action_selection} that such value functions can directly be used for action selection without needing to fit a separate policy network.
+We also noted previously that this requires simulating the results of the actions, which can be inconvenient.
+However, as in the tabular setting, we can circumvent this problem by directly fitting state-action values (`Q-values'), now using function approximation.
+This gives rise to the family of `deep Q-learning' methods, which closely mirror the tabular Q-learning considered previously, but now with function approximation.
+
+The general recipe involves defining a Q function $Q_\theta(a, s)$, where the parameters $\theta$ of the deep network defining our agent are learned as follows:
+\begin{itemize}
+    \item Collect experience $(s_t, a_t, r_t, s_{t+1})$.
+    \item Define a loss $\mathcal{L} = 0.5 [ Q_\theta(s_t, a_t) - (r_t + \text{max}_a Q_\theta(s_{t+1}, a)) ]^2 $.
+    \item Update the network parameters $\Delta \theta \propto \frac{\partial \mathcal{L}}{\partial \theta}$.
+\end{itemize}
+The above steps can either be run `online' using the experience of the agent as it is being generated, or it could occur `in batch', whereby a collection of experiences is first generated follow by optimization of the Q network.
+The `max' in the target value ensures that we continuously improve our policy.
+
+On the surface, the above looks like a straightforward generalization of tabular Q-learning, and it may seem surprising that deep Q-learning did not see significant use or success until \citet{mnih2013playing}.
+However, a major difficulty arises from the autocorrelation of the states observed by the agent, which leads to the network `chasing' a target function $(r_t + \text{max}_a Q_\theta(s_{t+1}, a))$ that changes whenever the environment changes.
+A critical advance that overcame the resulting instability was the use of an experience replay buffer, whereby the experience generated by the agent is added to a global replay buffer $\mathcal{B}$.
+A \emph{random} experience is then sampled from the buffer and used to update the network parameters.
+An additional algorithmic instability arises from the fact that $\mathcal{L}$ includes the term $\text{max}_a Q(s_{t+1}, a))$, which we cannot take gradients through.
+This means that we are trying to optimize our parameters for a continuously moving target, which destabilitizes the optimization process.
+To combat this, it is common to use a `target network' $Q_{\theta'}(s_{t+1}, a)$ that is fixed for a period of time, usually after being set to a copy of our 'student network'.
+Together, these two approaches give rise to Q-learning with a replay buffer and target network, as used by \citet{mnih2013playing}:
+\begin{itemize}
+    \item Collect experience $(s_t, a_t, r_t, s_{t+1})$ and add to $\mathcal{B}$ [optionally many iterations].
+    \item Sample a \emph{new} experience $(s'_t, a'_t, r'_t, s'_{t+1}) \sim \mathcal{B}$ [optionally a full batch].
+    \item Define a loss $\mathcal{L} = 0.5 [ Q_\theta(s'_t, a'_t) - (r_t + \text{max}_a Q_{\theta'}(s'_{t+1}, a')) ]^2 $ [optionally averaged over the full batch]. Note that we are training the student network with parameters $\theta$ using the target network with parameters $\theta'$ in the max.
+    \item Update the network parameters $\Delta \theta \propto \frac{\partial \mathcal{L}}{\partial \theta}$.
+    \item Once we have repeated the above enough times, set our target network to the student network: $\theta' \leftarrow \theta$.
+\end{itemize}
+As indicated above, this procedure usually involves sampling a full batch of experience when computing gradients.
+Experience can also be collected in batch, and usually `stale' experiences are periodically removed from $\mathcal{B}$.
+It is worth noting that this algorithm is effectively off-policy, since most experience in $\mathcal{B}$ was collected by a policy defined by an old set of parameters $\theta$ -- and the data in $\mathcal{B}$ can in fact be generated completely independently of the agent we are training.
+Finally, even though the above is more stable than naive deep Q-learning, an additional instability arises from the fact that $Q_{max} = \text{max}_a Q_{\theta'}(s'_{t+1}, a')$ uses the same Q values both to estimate which action is best and what the value of that action is, which leads to a positively biased estimate.
+This can be mitigated by using \emph{separate} Q networks to select the best action and evaluate its value, $Q_{max} \leftarrow Q_{\theta'}(s, \text{argmax}_a(Q_{\theta}(a)))$ \citep{van2016deep}.
+Commonly, this is done by simply using the student network for action selection and the target network to evaluate its expected value.
+
+While DQNs have shown impressive performance across a range of machine learning settings \citep{mnih2013playing, lillicrap2015continuous, schaul2015prioritized, kalashnikov2018qt}, they have seen less interest from the neuroscience community.
+This is perhaps paradoxical given the prevalence of tabular Q-learning in the theoretical neuroscience literature.
+An interesting exception to this includes recent work by \citet{makino2023arithmetic}, which shows parallels between the values learned in a DQN and neural  representations in mammalian cortex during a compositional behavioural task.
+Additionally, the importance of experience replay in DQNs \citep{mnih2013playing, schaul2015prioritized} has close parallels to the proposal that hippocampal replay constitutes a form of experience replay \citep{mattar2018prioritized} -- although the latter was only analyzed in a tabular setting.
+

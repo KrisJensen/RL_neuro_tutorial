@@ -1,0 +1,45 @@
+\section{Temporal difference learning}
+\label{sec:temporal_difference}
+
+In classical temporal-difference learning, we want to learn a \emph{value function} for a given state $s$ and policy $\pi$, which specifies the expected future reward when following $\pi$ starting from $s$:
+\begin{equation}
+    \label{eq:V-values}
+    V_{\pi}(s) = \mathbb{E}_{a \sim \pi} \left [ \sum_{t' = t} \gamma^{t' - t} r_{t'} | s_t = s \right ].
+\end{equation}
+Here, $\mathbb{E}_{a \sim \pi} [ \cdot ]$ indicates an expectation taken over trajectories $\tau$ resulting from the agent following the policy $\pi$.
+For the true value function, we can expand this as a self-consistency equation
+\begin{align}
+    \label{eq:value_expansion}
+    V_{\pi}(s) &= r_t + \sum_{s'} p_{\pi}(s_{t+1} = s' | s_t = s) \mathbb{E}_{a \sim \pi} \left [ \sum_{t' = t+1} \gamma^{t' - t} r_{t'} | s_{t+1} = s' \right ] \\
+    &=  r_t + \gamma \sum_{s'} p_{\pi}(s_{t+1} = s' | s_t = s) V_{\pi}(s'),
+\end{align}
+where $p_{\pi}(s_{t+1} = s' | s_t = s) = \sum_a \pi(a|s) p(s_{t+1} = s' | s_t = s, a_t = a)$ is the probability of transitioning from $s$ to $s'$ under $\pi$.
+
+When learning a value function, we can use this self-consistency relation as an objective function:
+\begin{equation}
+    \mathcal{L} \propto \left (  V_\pi(s_t) - (r_t + \gamma \mathbb{E}_\pi V_{\pi}(s_{t+1})) \right )^2,
+\end{equation}
+Gradient descent w.r.t $V_\pi(s_t)$ gives us an update rule
+\begin{align}
+    \label{eq:TD-learning}
+    \Delta V_\pi(s_t) &\propto - \frac{\mathcal{L}}{\partial V_\pi(s_t)}\\
+    &\propto V_\pi(s_t) - (r_t + \mathbb{E}_\pi V_{\pi}(s_{t+1}))\\
+    &\approx V_\pi(s_t) - (r_t + V_{\pi}(s_{t+1})).
+\end{align}
+The last line approximates the expectation over next states with a single sample corresponding to the state actually experienced.
+This is the canonical temporal difference learning rule, and it leads to learning dynamics where the temporal difference error $\delta := V_\pi(s_t) - (r_t + \mathbb{E}_\pi V_{\pi}(s_{t+1})$ is progressively propagated from the initial rewarding state to prior states that predict the reward.
+This forms the basis of the `temporal difference' signal proposed to be represented in dopaminergic VTA neurons \citep{schultz1997neural}.
+
+In the above, we simply learned a function for predicting reward without using this as the basis of taking good actions.
+Indeed, in classical Pavlovian conditioning, there are only states which happen in a predetermined order with no intervention or control on the part of the agent.
+However, having learned a value function, it is simple to use it for action selection provided we can estimate $p(s_{t+1} | s_t, a_t)$.
+In this case, we can write the expected reward associated with action $a$ as
+\begin{equation}
+    \mathbb{E} \left [\sum_{t' = t} r_{t'} | a_t = a \right ] = r_t + \sum_{s_{t+1}} p(s_{t+1} | s_t, a_t) V(s_{t+1}).
+\end{equation}
+We can then perform action selection by choosing the action with the highest expected reward,
+\begin{equation}
+    \label{eq:value_action_selection}
+    a^*(s) = \text{argmax}_{a} \left ( \mathbb{E} \left [\sum_{t' = t} r_{t'} | a_t = a \right ] \right ).
+\end{equation}
+

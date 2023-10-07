@@ -1,0 +1,31 @@
+\section{Introduction}
+\label{sec:intro}
+
+Humans and other animals learn from their experiences.
+Sometimes, this takes the form of explicit demonstration, as is often the case in our educational system.
+However, in many scenarios we have to infer a good course of action on the basis of trial and error together with feedback received from the world around us -- sometimes implicit and sometimes explicit.
+This is well illustrated by the classical experiment of Pavlov's dogs, who learned to associate the ringing of a bell with the availability of food shortly after.
+Following a brief period of learning, the dogs would start to salivate at the sound of the bell, whether or not food was actually served.
+This suggests that the dogs had learned to associate the ringing of the bell with the availability of `reward' in the form of food, and that they produced an appropriate physiological response to take advantage of this food availability.
+Importantly, this occurred without any explicit instruction or description of the sequence of events preceding food being served.
+Instead, the dogs learned from their actual experience with their environment and the presence of a salient, rewarding experience in the form of food availability.
+
+Such simple stimulus-response mappings are also called `Pavlovian learning' and have been commonly used in neuroscience to study learning from external rewards \citep{niv2009reinforcement}.
+This forms a specific instantiation of the more general concept of `reinforcement learning', which is a general term for settings where an agent has to learn on the basis of reward signals from the environment rather than explicit demonstration, as is the case in `supervised learning'.
+Importantly, the past decades have shown that principles of reinforcement learning can be used to explain not just behaviour, but also neural activity in biological circuits \citep{niv2009reinforcement}.
+An explicit neural basis of RL was initially demonstrated in foundational work by \citet{schultz1997neural}, which showed that dopaminergic neurons in the Ventral Tegmental Area (VTA) predict upcoming reward in the form of a drop of juice following a `conditioned stimulus' consisting of a lever-press in response to a small light turning on.
+This provided a potential neural substrate of the classical `temporal difference' learning algorithm, which has since been expanded to a wealth of evidence for reinforcement learning in neural dynamics \citep{niv2009reinforcement, dabney2020distributional}.
+However, these classical algorithms are generally restricted to simple problem settings, while humans and other animals are capable of solving complex high-dimensional problems involving extended planning and complex motor control.
+The field of `deep reinforcement learning' has recently emerged to tackle such problems in a machine learning setting, which has led to impressive results across a range of tasks \citep{mnih2013playing, schrittwieser2020mastering, wurman2022outracing}.
+Intriguingly recent research has demonstrated that these deep RL algorithms also have parallels in both behaviour and neural dynamics \citep{botvinick2020deep, wang2018prefrontal, dabney2020distributional, jensen2023recurrent, vinyals2019grandmaster}, suggesting that the field of neuroscience can continue to learn from advances in reinforcement learning.
+
+In this paper, we provide an overview of the reinforcement learning problem setting and popular algorithms with a focus on parallels and uses of these algorithms in neuroscience.
+This overview starts from classical tabular TD learning and Q-learning algorithms, which have guided neuroscientific research for decades.
+We then consider the important distinction between model-based and model-free reinforcement learning, as well as methods that fall somewhere in the gray area between these extremes, all of which have been important in shaping analyses of neural dynamics and behaviour.
+Finally, we generalize the tabular methods to the non-linear function approximation setting and the resulting deep RL methods, which have revolutionized machine learning in recent years.
+We do this with a focus on methods that have had a strong influence on neuroscience to give the reader a better idea of the mathematical and computational background of recent neuroscientific findings.
+Our hope is that this work will be useful both for those who are interested in the theory underlying reinforcement learning in neuroscience and for those who want an overview of how the neuroscientific literature builds on principles from reinforcement learning theory.
+Throughout the paper, the focus will be on an intuitive understanding of difference methods, and explicit derivations are included only where we consider them conducive to such understanding.
+We refer to \citet{sutton2018reinforcement} for a more in-depth treatment of the underlying theory.
+
+

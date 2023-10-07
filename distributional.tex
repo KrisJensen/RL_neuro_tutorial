@@ -1,0 +1,22 @@
+\section*{Distributional reinforcement learning}
+\label{sec:distributional}
+
+In \Cref{eq:V-values} and \Cref{eq:Q-values}, we defined the \emph{expected} reward for a given state or state-action pair.
+The methods considered so far have therefore only used such expectations as a learning signal.
+However, recent work has suggested that performance could be improved by learning the full \emph{distribution} of cumulative future rewards for a given state-action pair \citep{bellemare2017distributional, bellemare2023distributional,dabney2018distributional}, a single sample of which we denote $Z$:
+\begin{equation}
+    Z(s, a) \sim p(\sum_{t' >= t} r_{t'} | s_t = s, a_t = a)
+\end{equation}
+Clearly, these samples equal the corresponding Q value in expectation:
+\begin{equation}
+    \mathbb{E} Z(s, a) = Q(s, a).
+\end{equation}
+One use of learning this distribution is to develop methods which are risk averse \citep{morimura2010nonparametric,morimura2010nonparametric} or explicitly take into account uncertainty \citep{dearden1998bayesian}.
+However, recent work has suggested that such a distributional approach can also lead to improved performance in terms of expected rewards by improving the learning dynamics \citep{bellemare2017distributional}.
+
+In this case, the learning rule takes the form...
+
+Intriguingly, recent work in neuroscience has suggested that similar algorithms could potentially underlie learning in biological neural circuits \citep{dabney2020distributional,lowet2020distributional}.
+In particular, \citet{dabney2020distributional} recorded the activity of dopaminergic VTA neurons during a task with stochastic rewards and showed that the neurons appeared to represent the full distribution of possible outcomes.
+This was achieved by different neurons having different levels of `optimism' and generalizes the canonical RPE view of \citet{schultz1997neural}, which can be seen as the neuron-averaged version of the theory put forward by \citet{dabney2020distributional}.
+
