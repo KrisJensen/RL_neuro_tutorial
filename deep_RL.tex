@@ -16,7 +16,7 @@ In policy gradient methods, we directly train the network to output a policy, wh
 
 The conceptually simplest approach for deep reinforcement learning relies on the so-called policy gradient methods \citep{sutton2018reinforcement}.
 In this approach, we train a neural network with parameters $\theta$ to take as input the (observable) state of the environment and directly output a policy $\pi_\theta$.
-Our goal is then to find the setting of $\theta$ that maximizes the expected reward in \Cref{eq:bg_rl_obj}.
+Our goal is then to find the setting of $\theta$ that maximizes the expected reward in \Cref{eq:RL_objective}.
 A conceptually simple way to achieve this would be to use gradient descent with gradients given by
 \begin{align}
     \nabla_\theta J(\theta) &= \nabla_\theta \mathbb{E}_{\tau \sim \pi_\theta} \left [ R_\tau \right ]\\
