@@ -2,45 +2,61 @@
 \label{sec:distributional}
 
 In \Cref{eq:V-values} and \Cref{eq:Q-values}, we defined the \emph{expected} reward for a given state or state-action pair.
-The methods considered so far have therefore only used such expectations as a learning signal.
+The methods considered so far have only used such expectations as a learning signal.
 However, recent work has suggested that performance could be improved by learning the full \emph{distribution} of cumulative future rewards for a given state-action pair \citep{bellemare2017distributional, bellemare2023distributional,dabney2018distributional}, a single sample of which we denote $Z$:
 \begin{equation}
-    Z(s, a) \sim p(\sum_{t' >= t} r_{t'} | s_t = s, a_t = a)
+    Z(s, a) \sim p \left ( \sum_{t' >= t} \gamma^{t' - t} r_{t'} | s_t = s, a_t = a \right )
 \end{equation}
-Clearly, these samples equal the corresponding Q value in expectation:
+The stochasticity of $Z$ can both be due to stochasticity in environment dynamics and reward, or it could be due to stochasticity in the policy of the agent itself.
+Clearly, samples of $Z$ equal the corresponding Q value in expectation:
 \begin{equation}
-    \mathbb{E} Z(s, a) = Q(s, a).
+    \mathbb{E} \left [ Z(s, a) \right ] = Q(s, a).
 \end{equation}
 However, instead of estimating this expectation, we now want to learn the full distribution $p_\pi(Z(s, a))$.
 One use of learning this distribution is to develop methods which are risk averse \citep{morimura2010nonparametric,morimura2012parametric} or explicitly take into account uncertainty \citep{dearden1998bayesian}.
-However, recent work has suggested that such a distributional approach can also lead to improved performance in terms of expected rewards by improving the learning dynamics \citep{bellemare2017distributional}.
+However, recent work has suggested that such a distributional approach can also lead to improved performance in terms of expected rewards by improving the learning dynamics in the tabular setting and by improving representation learning in the deep RL setting \citep{bellemare2017distributional,dabney2018distributional,rowland2019statistics,bellemare2023distributional}.
 
 To learn $p_\pi(Z(s, a))$, one option is to define a set of `atoms' that tile the (expected) support of the distribution and then discretize the distribution by assigning the full probability mass to these discrete locations.
-$p_\pi(Z(s, a))$ can then be iteratively improved using temporal differences by propagating each atom using the Bellman equation (\Cref{eq:Q-optimal}), projecting the density back onto the discretized locations, and training our DQN to predict the corresponding probabilities via a KL loss.
+$p_\pi(Z(s, a))$ can then be iteratively improved using temporal differences by propagating each atom using the Bellman equation (\Cref{eq:Q-optimal}), projecting the density back onto the discretized locations, and training our RL agent to predict the corresponding probabilities.
 This is the approach originally employed by \citep{bellemare2017distributional}.
-However, it turns out to be more convenient from a neuroscience perspective to instead represent the cumulative distribution function (CDF) of $p_\pi(Z(s, a))$.
-We do this by defining the $\tau$ \emph{expectile} $E_\tau$, which is defined for a random variable Z as the solution of the equation
+However, it turns out to be more convenient from a neuroscientific perspective to instead represent a different set of sufficient statistics for $p_\pi(Z(s, a))$.
+We do this by defining the $\tau\textsuperscript{th}$ \emph{expectile} of $p_\pi(Z(s, a))$, $\epsilon_\tau$, which is defined for a random variable $Z$ as the solution to the equation
 \begin{equation}
-    \tau \mathbb{E} [\text{max}(0, X - E_\tau)] = (1-\tau) \mathbb{E} [\text{max}(0, E_\tau - X)].
+    \tau \mathbb{E} [\text{max}(0, X - \epsilon_\tau)] = (1-\tau) \mathbb{E} [\text{max}(0, \epsilon_\tau - X)].
 \end{equation}
-This is a generalization of the mean, which is recovered for $\tau = 0.5$, and is similar to have the quantile generalizes the notion of a median.
+This is a generalization of the mean, which is recovered for $\tau = 0.5$, and is similar to how the quantile generalizes the notion of a median.
 Importantly, a distribution is uniquely specified by its expectiles, and we can therefore represent $p_\pi(Z(s, a))$ in terms of its expectiles.
-
-This turns out to be simple to implement using a temporal-difference learning rule as demonstrated by \citep{dabney2018distributional}.
-In particular, we can define an update step...
-
-We refer for to \citet{dabney2018distributional} and \citet{bellemare2023distributional} for additional motivation and derivations.
+Translating this to an RL algorithm involves training a network (or tabular values) to predict a set of expectiles for a given state (and action).
+The parameters of the agent are then updated by propagating the predicted expectiles through a `Bellman equation', similar to \Cref{eq:value_expansion} or \Cref{eq:Q-optimal}, and minimizing the difference between the initial and propagated expectiles.
 
 
-Intriguingly, recent work in neuroscience has suggested that similar algorithms could potentially underlie learning in biological neural circuits \citep{dabney2020distributional,lowet2020distributional}.
-In particular, \citet{dabney2020distributional} recorded the activity of dopaminergic VTA neurons during a task with stochastic rewards and showed that the neurons appeared to represent the full distribution of possible outcomes using such an expectile representation.
+In the tabular value learning case (c.f. \Cref{sec:temporal_difference}), this turns out to be particularly simple do via the use of a modified TD-update rule (c.f. \Cref{eq:TD-learning}).
+In particular, we consider a set of atoms $\{ V_i \}$, each representing expectile $\tau_i := \frac{\alpha_i^+}{\alpha_i^+ + \alpha_i^-}$ of the value distribution $p_\pi(Z(s))$ (where $\mathbb{E}_{ p_\pi(Z(s))} \left [ Z(s) \right ] = V(s)$).
+These expectiles can be learned by sampling experience from the environment under the policy and defining a TD error for each atom and state transition as
+\begin{align}
+    \delta_i := r_t + \gamma V_j(s_{t+1}) - V_i(s_t),
+\end{align}
+where $V_j(s_{t+1})$ is the expectile corresponding to a \emph{random atom} from  $\{ V_i \}$.
+We then apply the following update rule to all atoms:
+\begin{equation}
+    \label{eq:DRL_V_expec}
+    \Delta V_i(s_t) = \alpha_i^+ \text{max}(\delta_i, 0 ) + \alpha_i^- \text{min}(\delta_i, 0).
+\end{equation}
+In other words, we apply the TD update rule with learning rate $\alpha_i^+$ for positive TD errors and learning rate $\alpha_i^-$ for negative TD errors.
+Another variant of this algorithm updates each atom with $\alpha_i \text{sign}(\delta_i)$ instead of $\alpha_i (\delta_i)$, which leads to learning of the \emph{quartiles} of the distribution.
+We refer to \citet{bellemare2017distributional,dabney2018distributional,rowland2019statistics,bellemare2023distributional,dabney2020distributional} for additional mathematical details and extensions to the control and deep RL settings.
+
+Intriguingly, recent work in neuroscience has suggested that a similar algorithm could potentially underlie value learning in biological neural circuits \citep{dabney2020distributional,lowet2020distributional}.
+In particular, \citet{dabney2020distributional} recorded the activity of dopaminergic VTA neurons during a task with stochastic rewards and showed that the neurons appeared to represent the full distribution of possible outcomes using an expectile representation as described above.
 More concretely, they showed that:
 \begin{itemize}
-    \item The VTA neurons exhibited a range of different `reversal points' -- defined as the expected reward at which they transitioned from a positive to a negative RPE.
-    This is consistent with a theory where neurons represent different expectiles, since the reversal point of a neuron is the value represented by its encoded expectile in the distributional RL framework.
-    \item These reversal points were correlated with the difference in slopes between the positive and negative regimes.
-    This is predicted by the update rule above where the expectile being represented (and therefore reversal point) should be proportional to $\frac{\alpha_i^{+}}{\alpha_i^- + \alpha_i^+}$ -- the reversal point according to the distributional RL theory.
-    \item When fitting a distribution to be maximally similar to the distribution implied by the VTA neurons when interpreted as expectiles, the resulting fit was remarkably similarly to the distribution learned by a distributional RL agent.
+    \item The VTA neurons exhibited a range of different `reversal points' -- defined as the reward magnitude at which the firing rate of a neuron did not change from its baseline firing rate.
+    This is consistent with a distributional RL theory, where neurons correspond to the TD updates considered above, since the reversal point of a neuron $i$ should in this case be $\epsilon_{\tau_i}$.
+    \item Neurons had different slopes describing the relationship between expected reward and firing rate in the regimes where expected reward was above and below the reversal point of each neuron.
+    This is consistent with the algorithm described in \Cref{eq:DRL_V_expec}.
+    \item When independently fitting a slope to the data above ($\alpha_i^+$) and below ($\alpha_i^-$) the reversal point of neuron $i$, the reversal point of the neuron was positively correlated with $\frac{\alpha_i^{+}}{\alpha_i^- + \alpha_i^+}$.
+    This is consistent with the expectile distributional RL setting, where the reversal point is $\epsilon_\tau$.
+    \item When fitting a distribution to be maximally similar to the distribution implied by the VTA neurons when interpreted as expectiles, the resulting fit was remarkably similar to the distribution learned by a distributional RL agent.
 \end{itemize}
 These findings generalize the canonical RPE view of \citet{schultz1997neural}, which can be seen as the neuron-averaged version of the theory put forward by \citet{dabney2020distributional}.
 
