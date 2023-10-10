@@ -4,7 +4,8 @@
 While we have tried to provide a fairly comprehensive overview of topics in reinforcement learning of interest to neuroscience, there are naturally many interesting areas that we have had to omit.
 Here we provide a brief description of some of these together with pointers to relevant literature for those who are interested in exploring them further.
 
-\subsection*{Auxiliary losses}
+\subsection{Auxiliary losses}
+\label{sec:auxiliary}
 A key challenge in deep reinforcement learning is that of `representation learning' \citep{botvinick2020deep}.
 In particular, because rewards are generally sparse, it can be difficult to learn the full processing pipeline from raw inputs to a latent representation conducive to action selection on the basis of rewards alone.
 It is therefore common in the machine learning literature to introduce additional `auxiliary costs' to the RL utility function, which use a richer data source to drive learning in the network.
@@ -12,13 +13,15 @@ A common example is to include predictive losses that ask the agent to predict t
 Such predictive losses have close parallels in neuroscience, where it has been suggested that predictive learning could result in many of the representations observed in biological circuits \citep{rao1999predictive, stachenfeld2017hippocampus, whittington2020tolman, blanco2021dopamine} and serve as a foundation for model-based planning \citep{jensen2023recurrent}.
 This suggests a potentially crucial interplay between self-supervised representation learning and reward-driven reinforcement learning in biological circuits.
 
-\subsection*{Hierarchical reinforcement learning}
+\subsection{Hierarchical reinforcement learning}
+\label{sec:HRL}
 So far, we have considered a simple environment consisting of states and actions, and all planning and decision making has taken place in the space of action primitives.
 However, when planning over longer horizons, it can be necessary to break down the overall policy into a series of sub-goals, sub-policies of `skills' \citep{sutton1999between, pateria2021hierarchical}.
 This is the topic of hierarhical reinforcement learning (HRL) and `options', where we have a high-level policy over policies that can themselves be specified in terms of primitive actions or even lower-level policies.
 Such HRL has been found to explain features of human behaviour \citep{eckstein2020computational} and remain an area of substantial interest in the neuroscience literature, although at present neural correlates of such hierarchical policies have not been characterized.
 
-\subsection*{Off-policy \& offline reinforcement learning}
+\subsection{Off-policy \& offline reinforcement learning}
+\label{sec:off-policy}
 In most of the work considered in this paper, the experience used to train the RL agents have been sampled from the policy of the agent itself.
 Indeed this is required for the gradients to be unbiased in the policy-gradient setting.
 However, an area of substantial interest is that of offline reinforcement learning, where the agent is trained from scratch on the basis of pre-collected experience \citep{levine2020offline}.
@@ -27,14 +30,16 @@ Off-policy reinforcement learning is the related problem of learning from a comb
 The off-policy setting is especially relevant to biology, where data collection is expensive and we therefore wish to make maximum use of existing data.
 This can e.g. be achieved through experience replay, which can be prioritized (instead of sampled on-policy) to maximize future reward and minimize temporal opportunity costs \citep{mattar2018prioritized, agrawal2022temporal}.
 
-\subsection*{Imitation learning}
+\subsection{Imitation learning}
+\label{sec:imitation}
 Related to the problem of offline reinforcement learning is that of \emph{imitation learning}, where we also learn from pre-collected data.
 However, in contrast to offline RL where we make no assumption about the quality of the policy used to collect the data, imitation learning assumes that the data has been collected by an `expert' we wish to imitate \citep{levine2020offline}.
 This is useful in cases where a large amount of expert data is available, such as the case of autonomous driving \citep{pan2017agile}.
 Imitation learning is clearly important during early development in biological organisms, where we learn from observing the individuals around us.
 Indeed, such imitation learning is a hallmark not just of humans but has also been demonstrated in organisms as `simple' as the bumblebee \citep{loukola2017bumblebees}.
 
-\subsection*{Linear reinforcement learning}
+\subsection{Linear reinforcement learning}
+\label{sec:linear_RL}
 As we have seen in most of this tutorial, reinforcement learning is generally difficult and require iterative algorithms that often scale poorly with the problem size.
 However, there are settings where we can simplify the promblem to the point where it becomes analytically tractable in an approach known as `linear reinforcement learning' \citep{todorov2006linearly, todorov2009efficient}.
 This is similar to the SR approach, where we saw that the value function reduces to a linear function of the reward-per-state.
@@ -49,7 +54,8 @@ This approach has recently been used as an explicit model of biological decision
 It also has close parallels to learning and planning as inference \citep{levine2018reinforcement, solway2012goal,botvinick2012planning} and to RL with information bottlenecks \citep{lai2021policy}.
 Both of these families of approaches also boil down to reinforcement learning with a KL-regularized reward function, and they have also been used as models of biological decision making.
 
-\subsection*{Successor features}
+\subsection{Successor features}
+\label{sec:SFs}
 In \Cref{sec:SR}, we saw that the successor representation can be used as the basis of decision making that flexibly adapts to environments with changing reward structures.
 However, we developed this framework only in the tabular setting, while extending TD-learning and Q-learning to the `deep RL' setting with function approximation, leaving the question of whether a similar generalization of the SR exists.
 This turns out to be the case and is known as `successor features' (SF; \citealp{barreto2017successor}), where the expected future observation of a given feature of the environment is used in place of the expected future state occupancy.

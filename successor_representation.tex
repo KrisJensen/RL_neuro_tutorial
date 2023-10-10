@@ -34,7 +34,9 @@ Here, ${s'}$ is the set of all other states, $s_{t+1}$ is the next state actuall
 
 The SR has also been proposed as a model of how humans and other animals learn and generalize \citep{momennejad2017successor, stachenfeld2017hippocampus, geerts2020general}.
 For example, humans have been shown to be able to adapt more readily to changes in the reward function than changes in the transition function in a simple sequential binary decision-making task \citep{momennejad2017successor}, consistent with the SR facilitating rapid adaptation to changes in $\b{r}$ but only slow learning of $\b{M}$.
-Additionally, hippocampal `place cells' have been proposed to encode a predictive map corresponding to the column of $\b{M}$, such that the firing of a place cell in a given location $s$ reflects the expected future occupancy of its `preferred' location $s'$ conditioned on being at $s$.
+Additionally, hippocampal `place cells' have been proposed to encode a predictive map, with each cell corresponding to a column of $\b{M}$ \citep{stachenfeld2017hippocampus}.
+In this model, the firing of a place cell in a given location $s$ reflects the expected future occupancy of its `preferred' location $s'$ conditioned on currently being at $s$.
+\citet{stachenfeld2017hippocampus} showed that the ST model explains a range of findings in the hippocampal literature, including asymmetric place fields on a one-dimensional track \citep{mehta2000experience} and local remapping of place fields near a barrier \citep{alvernhe2011local}.
 
 While the SR is perhaps the most prominent model in systems neuroscience that combines features of model-free and model-based RL, it is not the only one.
 Another interesting approach that has found parallels in the neuroscience literature is the `DYNA' architecture of \citet{sutton1991dyna}.

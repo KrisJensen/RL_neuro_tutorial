@@ -1,30 +1,30 @@
 \section{Model-free and model-based reinforcement learning}
 
 In the previous section, we developed a so-called `model-free' reinforcement learning algorithm.
-He we simply learn stimulus-response patterns that say `when in state $s$, take action $a$'.
-This leads to very simple behaviour at decision time, where we do not need to plan far into the future.
-However, it is also very data intensive to learn such model-free policies, and they can be very inflexible in changing environments.
+This involves learning a stimulus-response pattern that says `when in state $s$, take action $a$'.
+Such algorithms do not require much computation at decision time, where there is no need to plan far into the future.
+However, it can also be very data intensive to learn such model-free policies, and they can be very inflexible in changing environments.
 
 On the other hand, `model-based' reinforcement learning uses a model of the world to simulate the consequences of different actions at decision time.
-This can be much more data efficient, since learning a world model if often much simpler than learning a policy.
-However, it can also be computationally intensive at decision-time in complicated state spaces.
-These models have recently exhibited impressive performance across a range of RL settings with large state spaces, such as atari, chess, shogi, and go \citep{schrittwieser2020mastering}.
+This can be much more data efficient, since learning a world model is often simpler than learning a full policy.
+However, model-based decision making can also be computationally intensive at decision-time in complicated state spaces.
+Such models have recently exhibited impressive performance across a range of RL settings with large state spaces, including atari, chess, shogi, and Go \citep{silver2018general, schrittwieser2020mastering}.
 
-In such model-based reinforcement learning, experience is used to learn a transition-and-reward function $p(s_{t+1}, r_t | s_t, a_t)$ from past experience.
+In model-based RL, experience is used to learn a transition-and-reward function $p(s_{t+1}, r_t | s_t, a_t)$ from past experience.
 Once this model has been learned, it can be used for planning at decision time.
 This can be done for example by expanding the Q-value relation from \Cref{eq:Q-optimal}:
+{\small
 \begin{align}
     \label{eq:Q-search}
-    Q(s_t,a_t) &=  r_t + \sum_{s_{t+1}} p(s_{t+1} | s_t, a_t) \text{argmax}_{a_{t+1}} Q(s_{t+1}, a_{t+1})\\
-    &= r_t + \sum_{s_{t+1}} p(s_{t+1} | s_t, a_t) \text{argmax}_{a_{t+1}}
-    \left [ r(a_{t+1}, s_{t+1}) + \sum_{s_{t+2}} p(s_{t+2} | s_{t+1}, a_{t+1}) \text{argmax}_{a_{t+2}} Q(s_{t+2}, a_{t+2}) \right ]\\
+    Q(s_t,a_t) &=  r_t + \gamma \mathbb{E}_{p(s_{t+1} | s_t, a_t)} \left [ \text{argmax}_{a_{t+1}} Q(s_{t+1}, a_{t+1}) \right ]\\
+    &= r_t + \gamma \mathbb{E}_{p(s_{t+1} | s_t, a_t)} \left [ \text{argmax}_{a_{t+1}}
+    \left [ r(a_{t+1}, s_{t+1}) + \gamma \mathbb{E}_{p(s_{t+2} | s_{t+1}, a_{t+1})} \left [ \text{argmax}_{a_{t+2}} Q(s_{t+2}, a_{t+2}) \right ] \right ] \right ] \\
     %&= r_t + \sum_{s_{t+1}} p(s_{t+1} | s_t, a_t) \text{argmax}_{a_{t+1}}
     %\left [ r(a_{t+1}, s_{t+1}) + \sum_{s_{t+2}} p(s_{t+2} | s_{t+1}, a_{t+1}) \text{argmax}_{a_{t+2}}
     %\left [ r(a_{t+2}, s_{t+2}) + \sum_{s_{t+3}} p(s_{t+3} | s_{t+2}, a_{t+2}) \text{argmax}_{a_{t+3}} Q(s_{t+3}, a_{t+3}) \right ] \right ]
     &= \ldots
 \end{align}
-
-Unfortunately the optimization over all possible action sequences in \Cref{eq:Q-search} is an exponentially large problem in the planning depth, which makes it infeasible for any reasonably sized problem setting.
+} Unfortunately, the optimization over all possible action sequences in \Cref{eq:Q-search} is an exponentially large problem in the planning depth, which makes it infeasible for any reasonably sized problem setting.
 It is therefore common to either use `depth-first search' with limited breadth, or `breadth-first search' with limited depth.
 In breadth-first search, we consider all possible actions at each level of the search tree but terminate the search at a finite depth, instead used cached `model-free' state-values to estimate the reward-to-go from the termination of the search.
 This kind of `plan-until-habit' algorithm has also been proposed as a model of human behavior \citep{keramati2016adaptive}.
@@ -32,7 +32,8 @@ In depth-first search, we instead sample a series of paths from $s_t$ all the wa
 This is what is implemented in most Monte-Carlo tree-search methods, such as AlphaZero \citep{silver2018general}, which uses a hardcoded transition function, and MuZero \citep{schrittwieser2020mastering}, which uses a learned transition function.
 In both of these approaches, neural networks are used (i) to estimate the `reward-to-go' if the maximum search depth is reached before termination, and (ii) to select which actions to evaluate during the search process.
 
-A shortcoming of these MCTS-based approaches from a neuroscientific point of view is that they often perform very many node expansions -- 800 rollouts per decision in the case of MuZero and AlphaZero.
+A shortcoming of these MCTS-based approaches from a neuroscientific point of view is that they often perform very many node expansions.
+For example, MuZero and AlphaZero perform 800 rollouts to a leaf node for each decision that they make.
 While this can be done very quickly on a computer, it seems unrealistic as a model of human decision making.
 In some settings, it is possible to use more efficient algorithms once a model has been learned, such as Djikstra's algorithm or $A^*$-search in shortest-path problems \citep{hart1968formal}.
 Both of these have also been used as models of human decision making (cites).
