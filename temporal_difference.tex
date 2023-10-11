@@ -28,9 +28,10 @@ Gradient descent w.r.t $V_\pi(s_t)$ gives us an update rule
     &\approx V_\pi(s_t) - (r_t + \gamma V_{\pi}(s_{t+1})).
 \end{align}
 The last line approximates the expectation over next states with a single sample corresponding to the state and reward actually experienced.
-This is the canonical temporal difference learning rule, and it leads to learning dynamics where the temporal difference error $\delta := V_\pi(s_t) - (r(s_t) + \gamma \mathbb{E}_\pi V_{\pi}(s_{t+1})$ is progressively propagated from the initial rewarding state to prior states that predict the reward.
+\Cref{eq:TD-learning} is the canonical temporal difference learning rule, and it leads to learning dynamics where the temporal difference error $\delta := V_\pi(s_t) - (r(s_t) + \gamma \mathbb{E}_\pi V_{\pi}(s_{t+1}))$ is progressively propagated from the initial rewarding state to prior states that predict the reward.
 This forms the basis of the `temporal difference' signal proposed to be represented in dopaminergic VTA neurons \citep{schultz1997neural}.
-A wealth of other research also suggests a close correspondence between midbrain dopaminergic neural activity and temporal difference learning, and we refer to \citet{niv2009reinforcement} for a more comprehensive overview.
+Such theories of dopamine as a reinforcing signal is also consistent with experiments showing that stimulation of dopamine neurons can be a strong driver of learning in instrumental conditioning tasks \citep{olds1954positive, tsai2009phasic}.
+A wealth of other research also suggests a close correspondence between midbrain dopaminergic neural activity and temporal difference learning, and we refer to \citet{niv2009reinforcement} and others for a more comprehensive overview.
 
 In \Cref{eq:TD-learning}, we simply learned a function for predicting reward without using this as the basis of taking good actions.
 Indeed, in classical Pavlovian conditioning, there are only states which happen in a predetermined order with no intervention or control on the part of the agent.

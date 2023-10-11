@@ -65,4 +65,11 @@ Successor features have also been shown to have a biologically plausible impleme
 
 %\subsection*{Active exploration}
 
-%\subsection*{Multi-agent reinforcement learning}
+\subsection*{Multi-agent reinforcement learning}
+We have only considered the case of single agents interacting with a black-box environment.
+However, in many cases, multiple agents are simultaneously interacting with each other and the environment around them.
+This means that, from the point of view of a single agent, the other agents are part of its environment.
+However, a whole group of agents may be working together to maximize a single joint reward function -- as is e.g. the case for members of the same sports team.
+In such settings, there are interesting learning dynamics beyond the scope of the present tutorial, but which are covered more in e.g. refs.
+Additionally, the learning of many individual neurons in the brain from a single common reinforcing signal (in the form of e.g. dopamine) can be modelled as a multi-agent reinforcement learning problem \citep{sutton2018reinforcement}.
+If the `agents' (or neurons) are assumed to have Bernoulli distributed outputs, Williams provides some guarantees \citep{sutton2018reinforcement}.
