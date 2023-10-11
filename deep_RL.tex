@@ -69,6 +69,7 @@ This gives rise to the so-called `actor-critic' algorithm
 \begin{equation}
     \nabla_\theta J(\theta) \approx \frac{1}{N} \sum_{\tau \sim \pi_\theta}  \sum_{t=0}^T (R_t - V(s_t)) \nabla_\theta \log \pi_\theta (a_t|s_t).
 \end{equation}
+Interestingly, many studies in the neuroscience literature have suggested that the brain could be using something akin to an actor-critic algorithm, with dorsal striatum implementing the `actor' and ventral striatum the `critic' \citep{takahashi2008silencing,sutton2018reinforcement}.
 
 Finally, it is common to reduce the variance of our gradient estimator through an approach known as `bootstrapping'.
 To implement this, we note that
