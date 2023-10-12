@@ -52,7 +52,7 @@ This allows us to define $R_t := \sum_{t'=t}^T \gamma^{t'-t} r_{t'}$ and rewrite
     \nabla_\theta J(\theta) \approx \frac{1}{N} \sum_{\tau \sim \pi_\theta}  \sum_{t=0}^T R_t \nabla_\theta \log \pi_\theta (a_t|s_t).
 \end{equation}
 This is the formulation most commonly used, but it is worth noting that it is actually \emph{not} the same as \Cref{eq:orig_reinforce}, which would require us to use $R_t= \sum_{t'=t}^T \gamma^{t'-0} r_{t'}$.
-As briefly discussed in \Cref{sec:problem_setting}, this is because the discount factor $\gamma$ is generally used as a variance reduction method rather than an indication that we intrinsically care less about rewards later in the task, although \Cref{eq:reinforce} is also consistent with an interpretation of $\gamma$ as a termination probability.
+As briefly discussed in \Cref{sec:problem_setting}, this is because the discount factor $\gamma$ is generally used as a variance reduction method rather than an indication that we intrinsically care less about rewards later in the task, although \Cref{eq:reinforce} is also consistent with an interpretation of $(1-\gamma)$ as a termination probability.
 
 It is also straightforward to show that for a baseline $B(s_t)$ that does not depend on $a_t$,
 \begin{align}
@@ -99,12 +99,12 @@ While $\tilde{J}(\theta)$ has no intrinsic interpretation, it is chosen such tha
 \end{equation}
 Importantly, we no longer have to differentiate through the environment -- only the policy.
 
-The gradient w.r.t. the value function loss is given by
+The gradient of the value function loss is given by
 \begin{equation}
     \nabla_\phi \mathcal{L}_V = \nabla_\phi \sum_t \frac12  (V_\phi(s_t) - R_t)^2 = \sum_t (V_\phi(s_t) - R_t) \nabla_\phi V_\phi(s_t).
 \end{equation}
 When $\pi_\theta$ and $V_\phi$ share parameters, we also need to balance these the gradients w.r.t. $\theta$ and $\phi$ in our update step.
-We do this by defining $\delta_t = R_t - V(s_t)$, where $R_t$ can optionally be the bootstrapped estimate $r_t + \gamma V(s_{t+1})$, introducing a hyperparameter $\beta_V$, and maximizing the utility
+We do this by defining $\delta_t := R_t - V(s_t)$, where $R_t$ can optionally be the bootstrapped estimate $r_t + \gamma V(s_{t+1})$, introducing a hyperparameter $\beta_V$, and maximizing the utility
 \begin{equation}
     \mathcal{L} = \frac{1}{N} \sum_{\tau \sim \pi_\theta} \sum_{t=0}^T ( \log \pi_\theta (a_t|s_t) + \beta_V V_\phi(s_t) ) \delta_t .
 \end{equation}
@@ -118,7 +118,7 @@ This process, whereby an agent trained slowly on a large distribution of tasks c
 \citet{wang2018prefrontal} showed that such as meta-RL model can explain a range of neuroscientific findings, including
 \begin{itemize}
     \item Dynamic adaptation of the effective learning rate of an agent to the volatility of the environment \citep{behrens2007learning}.
-    \item The emergence of `model-based' behaviour in the so-called `two-step' task commonly used to distinguish between model-free and model-based RL \citep{miller2017dorsal,daw2011model}.
+    \item The emergence of `model-based' behaviour in the `two-step' task commonly used to distinguish between model-free and model-based RL \citep{miller2017dorsal,daw2011model}.
     \item The ability of animals to get progressively faster at learning when exposed to multiple tasks with a consistent abstract task structure \citep{harlow1949formation}.
 \end{itemize}
 Recently, \citet{jensen2023recurrent} also extended the work of \citet{wang2018prefrontal} to allow the meta-RL dynamics to learn not just from physical experience but also from imagined experience using a learned model of the environment, which resulted in `reaction times' consistent with human behaviour.
@@ -153,13 +153,13 @@ A \emph{random} experience is then sampled from the buffer and used to update th
 An additional algorithmic instability arises from the fact that $\mathcal{L}$ includes the term $\text{max}_a Q_\theta(s_{t+1}, a)$, which we cannot take gradients through despite its dependence on $\theta$.
 This means that we are trying to optimize our parameters for a continuously moving target, which destabilitizes the optimization process.
 To combat this, it is common to use a `target network' $Q_{\theta'}(s_{t+1}, a)$ that is fixed for a period of time, usually after being set to a copy of our `student network'.
-Together, these two approaches give rise to the `deep Q network' (DQN) developed by \citet{mnih2013playing}:
+Together, these two approaches give rise to the `deep Q network' (DQN) developed by \citet{mnih2013playing}, which is trained as follows:
 \begin{itemize}
     \item Collect experience $(s_t, a_t, r_t, s_{t+1})$ and add to $\mathcal{B}$ [optionally many iterations].
     \item Sample a \emph{new} experience $(s'_t, a'_t, r'_t, s'_{t+1}) \sim \mathcal{B}$ [optionally a full batch].
     \item Define a loss $\mathcal{L} = 0.5 [ Q_\theta(s'_t, a'_t) - (r'_t + \gamma \text{max}_a Q_{\theta'}(s'_{t+1}, a)) ]^2 $ [optionally averaged over the full batch]. Note that we are training the student network with parameters $\theta$ while using a target network with parameters $\theta'$ inside the max.
     \item Update the network parameters $\Delta \theta \propto - \frac{\partial \mathcal{L}}{\partial \theta}$.
-    \item Once we have repeated the a fixed number of times, set our target network to the student network, $\theta' \leftarrow \theta$.
+    \item Once we have repeated the above a sufficient number of times, set our target network to the student network, $\theta' \leftarrow \theta$.
 \end{itemize}
 As indicated above, this procedure usually involves averaging over a full batch of experience when computing gradients.
 Experience can also be collected in batch, and usually `stale' experiences are periodically removed from $\mathcal{B}$.

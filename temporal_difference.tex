@@ -14,7 +14,7 @@ For the true value function, we can expand this as a self-consistency equation
     &=  r(s) + \gamma \sum_{s'} p_{\pi}(s_{t+1} = s' | s_t = s) V_{\pi}(s'),
 \end{align}
 where $p_{\pi}(s_{t+1} = s' | s_t = s) = \sum_a \pi(a|s) p(s_{t+1} = s' | s_t = s, a_t = a)$ is the probability of transitioning from $s$ to $s'$ under $\pi$.
-Importantly, \Cref{eq:value_expansion} holds \emph{only} if the value function is correct.
+Importantly, \Cref{eq:value_expansion} holds \emph{only} if the value function is correct \citep{sutton2018reinforcement}.
 %
 When learning a value function $V(s_t)$, we can therefore use this self-consistency relation as an objective function:
 \begin{equation}

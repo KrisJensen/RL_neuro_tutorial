@@ -16,12 +16,12 @@ To learn the $Q$-values necessary for such action selection, we start by expandi
     \label{eq:Q-expanded}
     Q_\pi(s_t,a_t) =  r(s_t, a_t) + \gamma \sum_{s_{t+1}} p(s_{t+1} | s_t, a_t) \sum_{a_{t+1}} \pi(a_{t+1} | s_{t+1}) Q_\pi(s_{t+1}, a_{t+1}).
 \end{equation}
-For the optimal policy $\pi^*(s) := \delta(a, a^*(s))$, this gives rise to a self-consistency expression for the optimal state-action values:
+For the greedy policy $\pi^g(s) := \delta(a, a^*(s))$, this gives rise to a self-consistency expression for the state-action values:
 \begin{equation}
     \label{eq:Q-optimal}
-    Q_{\pi^*}(s_t,a_t) =  r(s_t, a_t) + \gamma \mathbb{E}_{s_{t+1} \sim p(s_{t+1} | s_t, a_t)} \left [ \text{max}_{a_{t+1}} Q_{\pi^*}(s_{t+1}, a_{t+1}) \right ].
+    Q_{\pi^g}(s_t,a_t) =  r(s_t, a_t) + \gamma \mathbb{E}_{s_{t+1} \sim p(s_{t+1} | s_t, a_t)} \left [ \text{max}_{a_{t+1}} Q_{\pi^g}(s_{t+1}, a_{t+1}) \right ].
 \end{equation}
-Importantly, this self-consistency expression only holds when the Q-values have converged to the the true expected rewards, and the associated greedy policy is therefore optimal \citep{sutton2018reinforcement}.
+Importantly, this self-consistency expression only holds when the Q-values have converged to the true expected rewards, and the associated greedy policy is therefore optimal \citep{sutton2018reinforcement}.
 We can therefore use \Cref{eq:Q-optimal} as a loss function by defining
 \begin{equation}
     \mathcal{L} \propto \left (  Q(s_t,a_t) - (r(s_t, a_t) + \gamma \mathbb{E}_{s_{t+1} \sim p(s_{t+1} | s_t, a_t)} \left [ \text{max}_{a_{t+1}} Q(s_{t+1}, a_{t+1}) \right ] ) \right )^2,

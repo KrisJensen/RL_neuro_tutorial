@@ -42,8 +42,8 @@ We then apply the following update rule to all atoms:
     \label{eq:DRL_V_expec}
     \Delta V_i(s_t) = \alpha_i^+ \text{max}(\delta_i, 0 ) + \alpha_i^- \text{min}(\delta_i, 0).
 \end{equation}
-In other words, we apply the TD update rule with learning rate $\alpha_i^+$ for positive TD errors and learning rate $\alpha_i^-$ for negative TD errors.
-Another variant of this algorithm updates each atom with $\alpha_i \text{sign}(\delta_i)$ instead of $\alpha_i (\delta_i)$, which leads to learning of the \emph{quartiles} of the distribution.
+In other words, we apply the TD update rule to each atom with learning rate $\alpha_i^+$ for positive TD errors and learning rate $\alpha_i^-$ for negative TD errors.
+Another variant of this algorithm updates each atom with $\alpha_i \text{sign}(\delta_i)$ instead of $\alpha_i (\delta_i)$, which leads to learning of the \emph{quartiles} of the distribution instead of the expectiles.
 We refer to \citet{bellemare2017distributional,dabney2018distributional,rowland2019statistics,bellemare2023distributional}; and \citet{dabney2020distributional} for additional mathematical details and extensions to the control and deep RL settings.
 
 Intriguingly, recent work in neuroscience has suggested that a similar algorithm could potentially underlie value learning in biological neural circuits \citep{dabney2020distributional,lowet2020distributional}.
