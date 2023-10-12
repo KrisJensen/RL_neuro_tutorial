@@ -7,42 +7,45 @@ In particular, the SR allows for flexible adaptation to changing reward function
 
 This formulation rewrites the expected reward starting from state $s$ as
 \begin{align}
-    J(s) &= \mathbb{E}_\pi \sum_t r_t \\
-    &= \sum_t \sum_{s'} p_\pi(s_t = s' | s_0 = s) r(s')\\
-    &= \sum_{s'} r(s') \sum_t p_\pi(s_t = s' | s_0 = s)\\
+    V_\pi(s) &= \mathbb{E}_\pi \left [ \sum_{t = 0} \gamma^t r_t | s_0 = s\right ] \\
+    &= \sum_{t = 0} \gamma^t \sum_{s'} p_\pi(s_t = s' | s_0 = s) r(s')\\
+    &= \sum_{s'} r(s') \sum_t \gamma^t p_\pi(s_t = s' | s_0 = s)\\
     &= \b{r}^T \b{m}^\pi_s.
 \end{align}
-Here, $\b{r}$ is a vector of the reward associated with each state, and $\b{m}^\pi_s$ is a vector of the expected future occupancy of state $s'$ given that the agent starts in state $s$ and follows the policy $\pi$, $M^\pi_{s s'} = \sum_t p_\pi(s_t = s' | s_0 = s)$.
-The full matrix $\b{M}^\pi$, constructed from stacking the $\b{m}^\pi_s$ corresponding to all states $s$, is denoted the `successor matrix', and constructing it allows us to write down vector of expected rewards from any state $s$ as
+Here, $\b{r}$ is a vector of the reward associated with each state, and $\b{m}^\pi_s$ is a vector of the expected discounted future occupancy of state $s'$ given that the agent starts in state $s$ and follows the policy $\pi$:
 \begin{equation}
-    \b{J} = \b{M}^\pi \b{r}.
+    M^\pi_{s s'} = \sum_{t = 0} \gamma^t p_\pi(s_t = s' | s_0 = s).
 \end{equation}
-Here, we have retained the superscript $\pi$ to indicate that the successor matrix depends on the policy of the agent, since this affects the expected occupancy of different states.
+The full matrix $\b{M}^\pi$, constructed from stacking the $\b{m}^\pi_s$ corresponding to all states $s$, is denoted the `successor matrix', and constructing it allows us to write down a vector of expected rewards from any state $s$ as
+\begin{equation}
+    \b{v}_\pi = \b{M}^\pi \b{r}.
+\end{equation}
+Here, we have retained the superscript $\pi$ to indicate that the successor matrix depends on the policy of the agent, which affects the expected occupancy of different states.
 Since this allows us to compute the value of each state, we can easily perform action selection as specified in \Cref{eq:value_action_selection}.
 
 The flexibility of the successor representation arises when the reward structure of the environment changes, $\b{r} \rightarrow \b{r}'$.
 We can now compute the expected reward associated with each state under the new reward function and old policy,
 \begin{equation}
-    \b{J}^* = \b{M}^\pi \b{r}^*.
+    \b{v}_\pi' = \b{M}^\pi \b{r}'.
 \end{equation}
 Of course this new value function will lead to us eventually changing our policy and having to update $\b{M}$, but it provides a much better starting point than using the wrong policy \emph{and} value function as in standard temporal-difference learning.
 Additionally, it has the appealing feature that the successor matrix can be learned by simple temporal-difference learning when transitioning from $s_t$, analogous to \Cref{eq:TD-learning}:
 \begin{equation}
-    \Delta M_{s_t s'} \propto -M_{ss'} + \delta(s_{t+1}, s') + M_{s_{t+1} s'}.
+    \Delta M_{s_t s'} \propto -M_{s_t s'} + \delta(s_t, s') + \gamma M_{s_{t+1} s'}.
 \end{equation}
-Here, ${s'}$ is the set of all other states, $s_{t+1}$ is the next state actually observed, and the learning rule says that transitioning from $s$ to $s'$ should increase the expected occupancy when in state $s$ of both $s'$ and all of the states commonly reached from $s'$.
+Here, ${s'}$ is the set of all other states, $s_{t+1}$ is the next state actually observed, and the learning rule says that transitioning from $s_t$ to $s_{t+1}$ means that (i) we have just been in state $s$, and (ii) we should increase the expected occupancy all of the states commonly reached from $s_{t+1}$ (including $s_{t+1}$ itself).
 
 The SR has also been proposed as a model of how humans and other animals learn and generalize \citep{momennejad2017successor, stachenfeld2017hippocampus, geerts2020general}.
 For example, humans have been shown to be able to adapt more readily to changes in the reward function than changes in the transition function in a simple sequential binary decision-making task \citep{momennejad2017successor}, consistent with the SR facilitating rapid adaptation to changes in $\b{r}$ but only slow learning of $\b{M}$.
 Additionally, hippocampal `place cells' have been proposed to encode a predictive map, with each cell corresponding to a column of $\b{M}$ \citep{stachenfeld2017hippocampus}.
 In this model, the firing of a place cell in a given location $s$ reflects the expected future occupancy of its `preferred' location $s'$ conditioned on currently being at $s$.
-\citet{stachenfeld2017hippocampus} showed that the ST model explains a range of findings in the hippocampal literature, including asymmetric place fields on a one-dimensional track \citep{mehta2000experience} and local remapping of place fields near a barrier \citep{alvernhe2011local}.
+\citet{stachenfeld2017hippocampus} showed that the SR model explains a range of findings in the hippocampal literature, including asymmetric place fields on a one-dimensional track \citep{mehta2000experience} and local remapping of place fields near a barrier \citep{alvernhe2011local}.
 
 While the SR is perhaps the most prominent model in systems neuroscience that combines features of model-free and model-based RL, it is not the only one.
 Another interesting approach that has found parallels in the neuroscience literature is the `DYNA' architecture of \citet{sutton1991dyna}.
 In this framework, a model of the world is learned from experience and used to train a model-free policy offline by bootstrapping imagined experience sampled from the model.
 This allows for more data-efficient learning of model-free policies at the cost of additional compute during `rest' but without necessarily needing more compute at decision time, in contrast to the model-based approaches discussed previously.
 The model used to simulate data for offline training can either be an explicit learned world model, or it can simply be a memory buffer of past experiences in the form of $(s_t, a_t, r_t, s_{t+1}, a_{t+1})$ tuples.
-Such experience replay has proven crucial to the success of modern deep reinforcement learning agents by allowing for higher data efficiency and reducing the instability arising from the autocorrelated nature of online experiences \citep{mnih2013playing,schaul2015prioritized}
+Such experience replay has proven crucial to the success of modern deep reinforcement learning agents by allowing for higher data efficiency and reducing the instability arising from the autocorrelated nature of online experience \citep{mnih2013playing,schaul2015prioritized}
 A prominent theory in neuroscience suggests that hippocampal replays could be implementing such a DYNA-like algorithm by generating imagined experience used to train the model-free RL systems of the brain \citep{mattar2018prioritized}.
-This was corroborated by showing that the patterns of replay exhibited by rodents in various navigation tasks were consistent with the optimal replays of a Q-learning agent with DYNA.
+This theory is supported by the finding that the patterns of replay exhibited by rodents in various navigation tasks are consistent with the optimal replays of a Q-learning agent with DYNA.

@@ -16,7 +16,7 @@ This suggests a potentially crucial interplay between self-supervised representa
 \subsection{Hierarchical reinforcement learning}
 \label{sec:HRL}
 So far, we have considered a simple environment consisting of states and actions, and all planning and decision making has taken place in the space of action primitives.
-However, when planning over longer horizons, it can be necessary to break down the overall policy into a series of sub-goals, sub-policies of `skills' \citep{sutton1999between, pateria2021hierarchical}.
+However, when planning over longer horizons, it can be necessary to break down the overall policy into a series of sub-goals, sub-policies, or `skills' \citep{sutton1999between, pateria2021hierarchical}.
 This is the topic of hierarhical reinforcement learning (HRL) and `options', where we have a high-level policy over policies that can themselves be specified in terms of primitive actions or even lower-level policies.
 Such HRL has been found to explain features of human behaviour \citep{eckstein2020computational,botvinick2008hierarchical,botvinick2009hierarchically} and remains an area of substantial interest in the neuroscience literature, although at present neural correlates of such hierarchical policies have not been characterized.
 
@@ -26,9 +26,9 @@ In most of the work considered in this paper, the experience used to train the R
 Indeed this is required for the gradients to be unbiased in the policy-gradient setting.
 However, an area of substantial interest is that of offline reinforcement learning, where the agent is trained from scratch on the basis of pre-collected experience \citep{levine2020offline}.
 This is particularly important in cases where online data collection is expensive or too risky but large-scale datasets exist, such as in many healthcare settings.
-Off-policy reinforcement learning is the related problem of learning from a combination of online data and pre-generated data, possible from a `stale' version of the current agent.
+Off-policy reinforcement learning is the related problem of learning from a combination of online data and pre-generated data, possibly from a `stale' version of the current agent.
 The off-policy setting is especially relevant to biology, where data collection is expensive and we therefore wish to make maximum use of existing data.
-This can e.g. be achieved through experience replay, which can be prioritized (instead of sampled on-policy) to maximize future reward and minimize temporal opportunity costs \citep{mattar2018prioritized, agrawal2022temporal}.
+This can e.g. be achieved through experience replay, which can be prioritized (instead of sampled on-policy) to maximize future reward and minimize temporal opportunity costs \citep{mattar2018prioritized, agrawal2022temporal,schaul2015prioritized}.
 
 \subsection{Imitation learning}
 \label{sec:imitation}
@@ -41,9 +41,9 @@ Indeed, such imitation learning is a hallmark not just of humans but has also be
 \subsection{Linear reinforcement learning}
 \label{sec:linear_RL}
 As we have seen in most of this tutorial, reinforcement learning is generally difficult and require iterative algorithms that often scale poorly with the problem size.
-However, there are settings where we can simplify the promblem to the point where it becomes analytically tractable in an approach known as `linear reinforcement learning' \citep{todorov2006linearly, todorov2009efficient}.
+However, there are settings where we can simplify the problem to the point where it becomes analytically tractable in an approach known as `linear reinforcement learning' \citep{todorov2006linearly, todorov2009efficient}.
 This is similar to the SR approach, where we saw that the value function reduces to a linear function of the reward-per-state.
-Similar to how the SR matrix can be seen as describing the dynamics of some `base policy', we also define a base policy in linear RL and compute a `control cost' as the KL divergence between transition dynamics with and without controller:
+Similar to how the SR matrix can be seen as describing the dynamics of some `base policy', we also define a base policy in linear RL and compute a `control cost' as the KL divergence between transition dynamics with and without our controller:
 \begin{equation}
     \mathcal{L}_{ctrl}(s) = KL \left [ u(s' | s) || p(s'|s) \right ],
 \end{equation}
@@ -57,19 +57,21 @@ Both of these families of approaches also boil down to reinforcement learning wi
 \subsection{Successor features}
 \label{sec:SFs}
 In \Cref{sec:SR}, we saw that the successor representation can be used as the basis of decision making that flexibly adapts to environments with changing reward structures.
-However, we developed this framework only in the tabular setting, while extending TD-learning and Q-learning to the `deep RL' setting with function approximation, leaving the question of whether a similar generalization of the SR exists.
+However, we developed this framework only in the tabular setting despite extending TD-learning and Q-learning to the `deep RL' setting with function approximation.
+This leaves open the question of whether a similar generalization of the SR exists.
 This turns out to be the case and is known as `successor features' (SF; \citealp{barreto2017successor}), where the expected future observation of a given feature of the environment is used in place of the expected future state occupancy.
 Successor features have also been shown to have a biologically plausible implementation that facilitates learning and generalization in noisy and partially observable environments \citep{vertes2019neurally}.
 
-%\subsection*{Reinforcement learning with human feedback}
+%\subsection{Reinforcement learning with human feedback}
 
-%\subsection*{Active exploration}
+%\subsection{Active exploration}
 
-\subsection*{Multi-agent reinforcement learning}
+\subsection{Multi-agent reinforcement learning}
+\label{sec:multi-agent}
 We have only considered the case of single agents interacting with a black-box environment.
-However, in many cases, multiple agents are simultaneously interacting with each other and the environment around them.
+However, in many cases, multiple agents are simultaneously interacting with each other and the environment around them \citep{gronauer2022multi}.
 This means that, from the point of view of a single agent, the other agents are part of its environment.
-However, a whole group of agents may be working together to maximize a single joint reward function -- as is e.g. the case for members of the same sports team.
-In such settings, there are interesting learning dynamics beyond the scope of the present tutorial, but which are covered more in e.g. refs.
-Additionally, the learning of many individual neurons in the brain from a single common reinforcing signal (in the form of e.g. dopamine) can be modelled as a multi-agent reinforcement learning problem \citep{sutton2018reinforcement}.
-If the `agents' (or neurons) are assumed to have Bernoulli distributed outputs, Williams provides some guarantees \citep{sutton2018reinforcement}.
+In such settings, there are interesting learning dynamics beyond the scope of the present tutorial, but which are covered in detail by e.g. \citet{gronauer2022multi}, and which are also of substantial interest in game theory \citep{nowe2012game}.
+In some cases, a whole group of agents may be working together to maximize a single joint reward function -- as is the case for members of a single sports team.
+Interestingly, the learning of many individual neurons in the brain from a single common reinforcing signal (such as dopamine) can be modelled as such a multi-agent reinforcement learning problem \citep{sutton2018reinforcement}.
+If the `agents' (or neurons) are assumed to have Bernoulli-logistic outputs, \citet{williams1992simple} shows that the independent learning of individual agents from the global reward signal leads to the implementation of a policy gradient algorithm at the population level \citep{sutton2018reinforcement}.
