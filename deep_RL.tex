@@ -8,7 +8,7 @@ This approach makes the assumption that similar states will also be associated w
 By making this assumption, we can generalize to unseen states based on our previous experience, provided that our function approximator is sufficiently good.
 Recent years have seen incredible progress being made in this respect by using deep or recurrent neural networks as powerful function approximators for reinforcement learning -- the domain of `deep reinforcement learning'.
 This approach has seen an increase in interest not just in the machine learning literature, but recently also as a model of neural dynamics and behaviour in humans and other animals \citep{wang2018prefrontal, jensen2023recurrent, makino2023arithmetic, merel2019deep, banino2018vector}.
-For a more comprehensive overview of the links between deep RL and neuroscience, we refer the interested reader to \citep{botvinick2020deep}.
+For a more comprehensive overview of the links between deep RL and neuroscience, we refer the interested reader to \citet{botvinick2020deep}.
 Modern approaches in deep RL can largely be divided into two categories: policy gradient methods and deep Q learning.
 In policy gradient methods, we directly train the network to output a policy, whereas deep Q networks (DQNs) output a set of state-action values which are then used for action selection.
 
@@ -22,7 +22,7 @@ A conceptually simple way to achieve this would be to define $R_\tau := \sum_{t=
     \nabla_\theta J(\theta) &= \nabla_\theta \mathbb{E}_{\tau \sim \pi_\theta} \left [ R_\tau \right ]\\
     &= \sum_{\tau} R_\tau \nabla_\theta p_\theta(\tau).
 \end{align}
-However, this requires differentiating through the environment, which we may not be able to do.
+However, this requires us to know exactly how the environment will respond to our actions in order to compute the necessary derivatives, which in general we may not know (although some model-based deep RL approaches train a differentiable predictive model of the environment to do this; \citealp{clavera2020model}).
 Instead, we use the `log-derivative trick', which takes advantage of the linearity of the expectation and the identity $\nabla_\theta \log f(\theta) = f(\theta)^{-1} \nabla_\theta f(\theta)$ to write
 \begin{align}
     \label{eq:deriv_J}
@@ -38,10 +38,11 @@ Since the environment does not depend on $\theta$, we can simplify the calculati
 \end{align}
 Inserting \Cref{eq:deriv_log_ptau} in \Cref{eq:deriv_J} and taking a Monte Carlo estimate of the expectation, we arrive at the REINFORCE algorithm \citep{williams1992simple}:
 \begin{align}
-    \label{eq:orig_reinforce}
     \nabla_\theta J(\theta) & = \mathbb{E}_{\tau \sim \pi_\theta} \left [ R_\tau \sum_{t=0}^T \nabla_\theta \log \pi_\theta (a_t|s_t) \right ]                                         \\
                             & \approx \frac{1}{N} \sum_{\tau \sim \pi_\theta} \left ( \sum_{t=0}^T \gamma^t r_t \right ) \left ( \sum_{t=0}^T \nabla_\theta \log \pi_\theta (a_t|s_t) \right ).
+    \label{eq:orig_reinforce}
 \end{align}
+Importantly, \Cref{eq:orig_reinforce} no longer requires us to differentiate through the environment -- only the policy.
 
 While the REINFORCE algorithm is unbiased, it also has high variance, which can make learning slow and unstable.
 It is therefore common to introduce modifications, which can help reduce the variance.
@@ -74,10 +75,10 @@ Interestingly, many studies in the neuroscience literature have suggested that t
 Finally, it is common to reduce the variance of our gradient estimator through an approach known as `bootstrapping'.
 To implement this, we note that
 \begin{equation}
-    \mathbb{E} \left [ R_t \right ] = \mathbb{E}[r_t + \gamma V(s_{t+1})],
+    \mathbb{E} \left [ R_t \right ] = \mathbb{E}[r_t + \gamma V(s_{t+1})].
 \end{equation}
-with the right-hand side having lower variance than the left-hand side.
-We can thus use $r_t + \gamma V(s_{t+1})$ as an estimate of $R_t$ to define the `advantage function' $A_t = r_t + \gamma V(s_{t+1}) - V(s_t)$, which gives rise to the `advantage actor critic' (A2C) algorithm:
+This is interesting because $r_t + \gamma V(s_{t+1})$ has lower variance than $R_t$, so using this bootstrapped estimate of the reward-to-go can reduce the noise in our gradient estimate when using finite sample sizes.
+We therefore use $r_t + \gamma V(s_{t+1})$ to define the `advantage function' $A_t = r_t + \gamma V(s_{t+1}) - V(s_t)$, which gives rise to the `advantage actor critic' (A2C) algorithm:
 \begin{equation}
     \nabla_\theta J(\theta) \approx \frac{1}{N} \sum_{\tau \sim \pi_\theta}  \sum_{t=0}^T (r_t + \gamma V(s_{t+1}) - V(s_t)) \nabla_\theta \log \pi_\theta (a_t|s_t).
 \end{equation}
@@ -97,7 +98,6 @@ While $\tilde{J}(\theta)$ has no intrinsic interpretation, it is chosen such tha
 \begin{equation}
     \nabla_\theta \tilde{J}(\theta) = \nabla_\theta J(\theta).
 \end{equation}
-Importantly, we no longer have to differentiate through the environment -- only the policy.
 
 The gradient of the value function loss is given by
 \begin{equation}
@@ -121,7 +121,9 @@ This process, whereby an agent trained slowly on a large distribution of tasks c
     \item The emergence of `model-based' behaviour in the `two-step' task commonly used to distinguish between model-free and model-based RL \citep{miller2017dorsal,daw2011model}.
     \item The ability of animals to get progressively faster at learning when exposed to multiple tasks with a consistent abstract task structure \citep{harlow1949formation}.
 \end{itemize}
-Recently, \citet{jensen2023recurrent} also extended the work of \citet{wang2018prefrontal} to allow the meta-RL dynamics to learn not just from physical experience but also from imagined experience using a learned model of the environment, which resulted in `reaction times' consistent with human behaviour.
+Recently, \citet{jensen2023recurrent} also extended the work of \citet{wang2018prefrontal} to allow the meta-RL agent to learn not just from physical experience but also from imagined experience using a learned model of the environment.
+This resulted in an agent that computes an intial model-free policy, which can be adaptively improved with model-based computations when the resulting policy improvement makes up for the temporal opportunity cost of the model-based computation.
+Interestingly, the response times of the resulting agent mirrored those of human participants in a maze navigation task, where the agent similarly spent more time `thinking' early in a trial and far from the goal.
 
 \subsubsection*{Deep Q-learning}
 

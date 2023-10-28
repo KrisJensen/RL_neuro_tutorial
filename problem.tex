@@ -5,7 +5,7 @@ Here we provide a short introduction to the reinforcement learning problem in a 
 For a more general treatment, we refer to \citet{sutton2018reinforcement}.
 In the discrete problem setting, the environment consists of states $s \in \mathcal{S}$, and the agent can take actions $a \in \mathcal{A}$.
 The environment is characterized by transition and reward probabilities $p(s_{t+1}, r_t | s_t, a_t)$, where $r_t$ is the reward at time $t$.
-We will generally assume that the reward is a function of the state and action, $r_t = r(s_t, a_t)$, where this denotes an expectation in the case of stochastic rewards and $r(s_t)$ denotes the expectation over actions.
+We will write $r_t = r(s_t, a_t)$ to denote either the reward when it depends deterministically on the state and action, or its expectation otherwise.
 We will further make the \emph{Markov assumption} that the next state only depends on the current state and action, $p(s_{t+1}, r_t | s_t, a_t, s_{t-1}, a_{t-1}, ..., s_0, a_0) = p(s_{t+1}, r_t | s_t, a_t)$.
 
 We can now define a \emph{trajectory} $\tau = \{ s_t, a_t, r_t \}_{t = 0}^T$, where
