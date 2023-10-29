@@ -34,6 +34,8 @@ Gradient descent w.r.t $Q(s_t,a_t)$ gives us an update rule
 \end{align}
 This is the so-called Q-learning update rule \citep{watkins1989learning}, where we have again estimated the expectation over next states with the single sample actually seen by the agent.
 
+\input{./figs_tex/_Q.tex}
+
 Q-learning is guaranteed to converge to the true Q-values in the limit of infinitesimal learning rates and infinite sampling of the state-action space \citep{watkins1992q,sutton2018reinforcement}.
 However, following the greedy policy $a^*(s) = \text{argmax}_{a} Q(s, a)$ before convergence of the Q values can lead to undersampling of the state-action space and poor performance.
 It is therefore common to either use an `$\epsilon$-greedy' policy, $\pi(a|s) = \epsilon / |\mathcal{A}| + (1-\epsilon) \delta(a, a^*(s))$, or a softmax-policy, $\pi(a|s) \propto \text{exp}(\beta Q(a, s))$, to collect the experience used to update the Q values.

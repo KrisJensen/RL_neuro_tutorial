@@ -1,0 +1,25 @@
+\begin{figure*}[!t]
+    \centering
+    \vspace*{-0.5em}
+    \includegraphics[width=0.85\textwidth]{./figs/Q.pdf}
+    \caption[TD]{\label{fig:Q}
+        %
+        {\bfseries Q-learning.}
+        {\bfseries (A)}~Empirical reward as a function of episode number for Q-learners with different levels of stochasticity in their policy ($\epsilon \in \{0, 0.1, 0.2\}$; legend).
+        For these simulations, we used a learning rate of $\delta = 0.05$ for all agents and no temporal discount factor ($\gamma = 1$).
+        The agent with $\epsilon = 0$ converges to an optimal policy, similar to the TD agent in \Cref{fig:TD}A.
+        However, convergence is in this case slower despite using the same learning rate, because the Q-learner has to learn about each action independently while the TD agent used its one-step world model to aggregate learning across actions going to the same state.
+        In this cliffworld environment, increasing epsilon leads to worse performance since it increases the probability of falling of the cliff.
+        Additionally, there is no risk of getting stuck in a local minimum since there is only one rewarding state, which decreases the value of exploration.
+        {\bfseries (B)}~As in (A), now for a non-cliffworld grid environment with two goals: one with a reward of +20 at location (0, 4), and one with a reward of +50 at location (5,0).
+        In this case, having non-zero epsilon can increase the probability of discovering the `high reward' goal rather than getting stuck with a locally optimal policy of moving to the `low reward' goal.
+        In these simulations, we used a learning rate of $\delta = 1$, since this effect is less robust with lower learning rates that lead to more exploration of the environment across all agents.
+        {\bfseries (C)}~Policy learned by a Q-learning and SARSA agent with $\epsilon = 0.2$.
+        The Q-learning agent learns to move right above the cliff because this is the optimal thing to do assuming that subsequent actions are also optimal.
+        This is because it is an `off-policy' algorithm that does not take into account the actual policy of the agent.
+        In contrast, the SARSA agent learns to move a `safe distance' away from the cliff since it is an `on-policy' algorithm that takes into account the finite probability of the agent choosing to move off the cliff from any state along the edge.
+        In many cases, a Q-learning agent is also trained using a stochastic $\epsilon$-greedy policy but evaluated with the greedy policy corresponding to $\epsilon = 0$.
+        }
+    \vspace*{-1.0em}
+\end{figure*}
+
