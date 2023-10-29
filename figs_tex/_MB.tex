@@ -1,0 +1,22 @@
+\begin{figure*}[!t]
+    \centering
+    \vspace*{-0.5em}
+    \includegraphics[width=0.85\textwidth]{./figs/MB.pdf}
+    \caption[TD]{\label{fig:MB}
+        %
+        {\bfseries Q-learning.}
+        {\bfseries (A)}~Learning curves for model-based (MB) and model-free (MF) RL agents.
+        In this case, the MB agent used a depth-first tree search to compute an optimal path at each decision point.
+        If a shorter path to a given state had already been discovered, the search was not continued.
+        The reward and transition functions of the agent were initialized to zero and the empty set respectively, and they were gradually populated as the agent explored the environment across episodes.
+        The MF agent was a simple Q-learning agent with $\epsilon = 0$ and $\delta = 0$.
+        We see that the MB agent requires substantially less experience than the MF agent for a given level of performance.
+        {\bfseries (B)}~Wallclock time consumed for 100 episodes for either the MB or MF agents from (A).
+        Although the MB agent required substantially less experience to learn a good policy, the wallclock time was much larger than that required by the MF agent.
+        This illustrates an important balance between model-based and model-free reinforcement learning, where MF methods usually require more experience but MB methods require more compute.
+        {\bfseries (C)}~Learning curve for SR.
+        {\bfseries (D)}~Learning curve for DYNA.
+        }
+    \vspace*{-1.0em}
+\end{figure*}
+

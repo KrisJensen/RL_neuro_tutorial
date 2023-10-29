@@ -15,6 +15,7 @@
         In this case, having non-zero epsilon can increase the probability of discovering the `high reward' goal rather than getting stuck with a locally optimal policy of moving to the `low reward' goal.
         In these simulations, we used a learning rate of $\delta = 1$, since this effect is less robust with lower learning rates that lead to more exploration of the environment across all agents.
         {\bfseries (C)}~Policy learned by a Q-learning and SARSA agent with $\epsilon = 0.2$.
+        Colours indicate the maximum value of any action in a state from blue (low) to yellow (high), and arrows indicate which action has the highest value.
         The Q-learning agent learns to move right above the cliff because this is the optimal thing to do assuming that subsequent actions are also optimal.
         This is because it is an `off-policy' algorithm that does not take into account the actual policy of the agent.
         In contrast, the SARSA agent learns to move a `safe distance' away from the cliff since it is an `on-policy' algorithm that takes into account the finite probability of the agent choosing to move off the cliff from any state along the edge.

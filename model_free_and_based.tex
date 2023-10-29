@@ -35,6 +35,8 @@ This is what is implemented in most Monte-Carlo tree search (MCTS) methods, such
 In both of these approaches, neural networks are used (i) to estimate the `reward-to-go' if the maximum search depth is reached before termination, and (ii) to select which actions to evaluate during the search process.
 Methods for learning such value functions and policies in neural networks are covered in more detail in \Cref{sec:deep_RL}.
 
+\input{./figs_tex/_MB.tex}
+
 A shortcoming of these MCTS-based approaches from a neuroscientific point of view is that they often perform very many node expansions.
 For example, MuZero and AlphaZero perform 800 rollouts to a leaf node for each decision that they make.
 While this can be done very quickly on a computer, it seems unrealistic as a model of human decision making.
