@@ -2,20 +2,24 @@
     \centering
     \vspace*{-0.5em}
     \includegraphics[width=0.85\textwidth]{./figs/MB.pdf}
-    \caption[TD]{\label{fig:MB}
+    \caption[MB]{\label{fig:MB}
         %
-        {\bfseries Q-learning.}
+        {\bfseries Model-based reinforcement learning.}
         {\bfseries (A)}~Learning curves for model-based (MB) and model-free (MF) RL agents.
         In this case, the MB agent used a depth-first tree search to compute an optimal path at each decision point.
         If a shorter path to a given state had already been discovered, the search was not continued.
         The reward and transition functions of the agent were initialized to zero and the empty set respectively, and they were gradually populated as the agent explored the environment across episodes.
         The MF agent was a simple Q-learning agent with $\epsilon = 0$ and $\delta = 0$.
         We see that the MB agent requires substantially less experience than the MF agent for a given level of performance.
-        {\bfseries (B)}~Wallclock time consumed for 100 episodes for either the MB or MF agents from (A).
-        Although the MB agent required substantially less experience to learn a good policy, the wallclock time was much larger than that required by the MF agent.
+        {\bfseries (B)}~Wallclock time needed to run 100 episodes of cliffworld with either the MB or MF agents from (A).
+        Although (A) shows that the MB agent requires substantially less experience to learn a good policy, the wallclock time was much larger than that required by the MF agent.
         This illustrates an important balance between model-based and model-free reinforcement learning, where MF methods usually require more experience but MB methods require more compute.
-        {\bfseries (C)}~Learning curve for SR.
-        {\bfseries (D)}~Learning curve for DYNA.
+        {\bfseries (C)}~Learning curve for an agent using the successor representation together with learning curves for the model-based agent in (A) and the greedy TD-agent from \Cref{fig:TD}.
+        Before episode 40, the goal was moved from location (9, 0) to location (0, 4) and location (9, 0) was instead given a reward of -5.
+        The MB and SR agents had their reward functions updated to reflect this change and were immediable able to adapt their policies, while the TD agent had no such mechanism for robustness to changing reward functions.
+        It is worth noting that an SR agent cannot always adapt to a new reward function if the newly rewarded states have low probablity under the old policy, since the successor matrix itself is a function of the policy.
+        {\bfseries (D)}~Learning curve for a Q-learning agent (blue) together with DYNA agents that are allows different numbers of Q updates for each step of physical action.
+        We see that DYNA agents are able to make better use of limited experience, although this comes at the cost of increased compute (proportional to the number of updates per step).
         }
     \vspace*{-1.0em}
 \end{figure*}
