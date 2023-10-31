@@ -1,0 +1,24 @@
+\begin{figure*}[!t]
+    \centering
+    \vspace*{-0.5em}
+    \includegraphics[width=0.95\textwidth]{./figs/metaRL.pdf}
+    \caption[metaRL]{\label{fig:meta}
+        {\bfseries Meta reinforcement learning.}
+        The results in this figure reproduce some of the preliminary analyses in Figure 1 of \citet{wang2018prefrontal}.
+        {\bfseries (A)}~We trained a recurrent meta-reinforcement learning agent in a two-armed bandit task, where the reward probabilities of each arm were sampled independently from $\mathcal{U}(0, 1)$ at the beginning of each episode and remained fixed throughout the episode.
+        A recurrent neural network was trained across many episodes with \emph{different reward probabilities} using an actor-critic algorithm.
+        The input to the agent consisted of the previous action, the pervious reward, and the time-within-trial.
+        The average reward per episode is plotted against the episode number, showing that the agent gradually learns to adapt within each episode to the particular instantiation of the bandit task.
+        Importantly, the parameters of the network are fixed within an episode, meaning that this adaptation occurs through the recurrent dynamics.
+        {\bfseries (B)}~Heatmap showing example behaviors in episodes with different reward probabilities for the first arm, $p(t | a = 1)$.
+        For these plots, the probability of reward from the second arm was set to $p(t | a = 2) = 1 - p(t | a = 1)$.
+        Across episodes, the agent experiments with different actions and eventually converges on taking the optimal action.
+        For episodes with more symmetric reward probabilities (near the middle), it takes longer for the agent to identify the optimal action.
+        This balance between exploration and exploitation is mediated by the recurrent networks dynamics, which are trained over many episodes using deep reinforcement learning.
+        {\bfseries (C)}~We averaged the hidden state of the RNN across 100 episodes for different reward probabilities, ranging from high reward for action 1 (blue) to low reward for action 1 (green), and performed PCA on the resulting matrix of average hidden states for different reward probabilities.
+        This figure shows the 2-dimensional embedding of neural activity in the meta-RL agent, where we see that the agent converges to different regions of state space for different envirinments.
+        Crosses indicate the hidden state at the beginning of each episode.
+        }
+    \vspace*{-1.0em}
+\end{figure*}
+

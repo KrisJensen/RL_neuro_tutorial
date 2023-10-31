@@ -1,0 +1,26 @@
+\begin{figure*}[!t]
+    \centering
+    \vspace*{-0.5em}
+    \includegraphics[width=0.95\textwidth]{./figs/dist.pdf}
+    \caption[Distributional]{\label{fig:dist}
+        %
+        {\bfseries Distributional reinforcement learning.}
+        The results in this figure reproduce some of the key analyses of \citet{dabney2020distributional}.
+        {\bfseries (A)}~Distribution of rewards (black), plotted together with the values converged to across 20 units all learning through standard TD learning (blue), and the expectiles converged to across 20 atoms learning with distributional RL using different $\tau_i = \frac{\alpha_i^+}{\alpha_i^+ + \alpha_i^-}$ (green).
+        The TD units all converge to the mean reward, while the expectile atoms end up tiling the distribution.
+        {\bfseries (B)}~For both the TD units and distributional units from (A), we plot the temporal difference updates performed in response to different rewards from the reward distribution.
+        These updates have been proposed to be represented in the firing rate of dopaminergic VTA neurons \citep{schultz1997neural,dabney2020distributional}.
+        The TD units show a constant linear scaling across positive and negative rewards, while the distributional units show an asymmetric scaling of firing rate with reward magnitude above and below their reversal point.
+        The level of asymmetry scales positively with reversal point.
+        These features of dopaminergic VTA neurons are what led \citet{dabney2020distributional} to propose that the brain implements a form of distributional RL.
+        {\bfseries (C)}~True distribution (black) reproduced from (A), now plotted together with the reward distribution implied by the distributional units from (A) and (B) at different stages of learning (light to dark green).
+        These imputed distributions were computed by \emph{assuming} that the value learned by unit $i$ corresponds to the expectile $\tau_i = \frac{\alpha_i^+}{\alpha_i^+ + \alpha_i^-}$.
+        We then impute the distribution implied by these expectiles by assuming it takes the form of a set of $N$ delta functions in the case of $N$ expectiles.
+        Finally, we convolved the resulting delta functions with a Gaussian kernel ($\sigma = 0.1$) for visualization.
+        This whole process was repeated using the expectiles represented in the population at different stages of learning.
+        The atoms were all initialized at $V_i = 0.5$, so the initial distribution is a delta function at $r = 0.5$.
+        However, at the end of learning, the population faithfully represents the true reward distribution, capturing key features including bimodality and the relative magnitude of the two different modes.
+        }
+    \vspace*{-1.0em}
+\end{figure*}
+
