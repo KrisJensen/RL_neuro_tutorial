@@ -29,7 +29,6 @@ Importantly, a distribution is uniquely specified by its expectiles, and we can 
 Translating this to an RL algorithm involves training a network (or tabular values) to predict a set of expectiles for a given state (and action).
 The parameters of the agent are then updated by propagating the distribution implied by the predicted expectiles through a `Bellman equation', similar to \Cref{eq:value_expansion} or \Cref{eq:Q-optimal}, and minimizing the difference between the initial and propagated distributions.
 
-
 In the tabular value learning case (c.f. \Cref{sec:temporal_difference}), this turns out to be particularly simple do via the use of a modified TD-update rule (c.f. \Cref{eq:TD-learning}; \citealp{lowet2020distributional}).
 In particular, we consider a set of atoms $\{ V_i \}$, each representing expectile $\tau_i := \frac{\alpha_i^+}{\alpha_i^+ + \alpha_i^-}$ of the value distribution $p_\pi(Z(s))$ (where $\mathbb{E}_{ p_\pi(Z(s))} \left [ Z(s) \right ] = V(s)$).
 These expectiles can be learned by sampling experience from the environment under the policy and defining a TD error for each atom and state transition as
@@ -45,6 +44,8 @@ We then apply the following update rule to all atoms:
 In other words, we apply the TD update rule to each atom with learning rate $\alpha_i^+$ for positive TD errors and learning rate $\alpha_i^-$ for negative TD errors.
 Another variant of this algorithm updates each atom with $\alpha_i \text{sign}(\delta_i)$ instead of $\alpha_i (\delta_i)$, which leads to learning of the \emph{quartiles} of the distribution instead of the expectiles.
 We refer to \citet{bellemare2017distributional,dabney2018distributional,rowland2019statistics,bellemare2023distributional}; and \citet{dabney2020distributional} for additional mathematical details and extensions to the control and deep RL settings.
+
+\input{./figs_tex/_dist.tex}
 
 Intriguingly, recent work in neuroscience has suggested that a similar algorithm could potentially underlie value learning in biological neural circuits \citep{dabney2020distributional,lowet2020distributional}.
 In particular, \citet{dabney2020distributional} recorded the activity of dopaminergic VTA neurons during a task with stochastic rewards and showed that the neurons appeared to represent the full distribution of possible outcomes using an expectile representation as described above.
