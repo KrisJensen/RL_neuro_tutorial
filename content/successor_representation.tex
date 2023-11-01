@@ -21,19 +21,19 @@ The full matrix $\b{M}^\pi$, constructed from stacking the $\b{m}^\pi_s$ corresp
     \b{v}_\pi = \b{M}^\pi \b{r}.
 \end{equation}
 Here, we have retained the superscript $\pi$ to indicate that the successor matrix depends on the policy of the agent, which affects the expected occupancy of different states.
-Since this allows us to compute the value of each state, we can easily perform action selection as specified in \Cref{eq:value_action_selection}.
+Since this allows us to compute the value of each state, we can perform action selection using \Cref{eq:value_action_selection}.
 
 The flexibility of the successor representation arises when the reward structure of the environment changes, $\b{r} \rightarrow \b{r}'$.
 We can now compute the expected reward associated with each state under the new reward function and old policy,
 \begin{equation}
     \b{v}_\pi' = \b{M}^\pi \b{r}'.
 \end{equation}
-Of course this new value function will lead to us eventually changing our policy and having to update $\b{M}$, but it provides a much better starting point than using the wrong policy \emph{and} value function as in standard temporal-difference learning (\Cref{fig:MB}C).
+Of course this new value function will lead to us eventually changing our policy and having to update $\b{M}$, but it provides a better starting point than using the wrong policy \emph{and} value function as in standard temporal-difference learning (\Cref{fig:MB}C).
 Additionally, it has the appealing feature that the successor matrix can be learned by simple temporal-difference learning when transitioning from $s_t$, analogous to \Cref{eq:TD-learning}:
 \begin{equation}
     \Delta M_{s_t s'} \propto -M_{s_t s'} + \delta(s_t, s') + \gamma M_{s_{t+1} s'}.
 \end{equation}
-Here, ${s'}$ is the set of all other states, $s_{t+1}$ is the next state actually observed, and the learning rule says that transitioning from $s_t$ to $s_{t+1}$ means that (i) we have just been in state $s$, and (ii) we should increase the expected occupancy all of the states commonly reached from $s_{t+1}$ (including $s_{t+1}$ itself).
+Here, ${s'}$ is the set of all other states, $s_{t+1}$ is the next state actually observed, and the learning rule says that transitioning from $s_t$ to $s_{t+1}$ means that (i) we have just been in state $s_t$, and (ii) we should increase the expected occupancy of all states commonly reached from $s_{t+1}$ (including $s_{t+1}$ itself).
 
 The SR has also been proposed as a model of how humans and other animals learn and generalize \citep{momennejad2017successor, stachenfeld2017hippocampus, geerts2020general}.
 For example, humans have been shown to be able to adapt more readily to changes in the reward function than changes in the transition function in a simple sequential binary decision-making task \citep{momennejad2017successor}, consistent with the SR facilitating rapid adaptation to changes in $\b{r}$ but only slow learning of $\b{M}$.

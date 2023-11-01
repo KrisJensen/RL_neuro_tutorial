@@ -7,19 +7,19 @@
         {\bfseries The reinforcement learning problem and cliffworld environment.}
         {\bfseries (A)}~Illustration of the reinforcement learning problem.
         An agent (the chick) has to interact with the world to maximize its lifetime reward.
-        This involves a balance between exploring potentially interesting states (e.g. a new perch) while also exploiting states known to yield high reward (i.e. its current favorite perch).
+        This involves a balance between exploring potentially interesting states (e.g. learning to fly) while also exploiting states known to yield high reward (e.g. sitting in the nest and eating food brought back by its parents).
         At any given point in time, the chick is in some state $s_t$ from which it can take an action $a_t$, with the probability of different actions determined by the `policy' $\pi(a|s_t)$, which is determined by the agent.
         $a_t$ then leads to a change in the environment according the non-controllable environment dynamics $s_{t+1}, a_t \sim p(s_{t+1}, r_t | s_t, a_t)$.
         Here, $r_t$ is the empirical `reward' received by the agent, and its objective is to collect as much cumulative reward as possible.
         Often, reinforcement learning problems are divided into `episodes', with the agent learning over the course of multiple repeated exposures to the environment.
-        This could for example consist of the chick learning over the course of multiple days when to the trough in anticipation of food.
+        This could for example consist of the chick learning over the course of multiple days when to wake up in anticipation of its parents bringing back food.
         {\bfseries (B)}~The `cliffworld' environment, which will be used to demonstrate the performance and behavior of a range of reinforcement learning algorithms in this work.
-        The agent starts in the lower left corner (location [0, 0]) and the episode finished when it encounters either the `cliff' (dark blue) or the goal (yellow; location [9,0]).
+        The agent starts in the lower left corner (location [0, 0]) and the episode finishes when it encounters either the `cliff' (dark blue) or the goal (yellow; location [9,0]).
         If the agent walks off the cliff, it receives a reward of -100.
         If it finds the goal, it receives a reward of +50.
         In any other state, it receives a reward of -1.
         Such negative rewards for `neutral' actions are commonly used to encourage the agent to achieve its goal as fast as possible.
-        The arrows indicate the `optimal' policy, which takes the agent to the goal via the shortest possible route while avoiding the cliffs.
+        The arrows indicate the `optimal' policy, which takes the agent to the goal via the shortest possible route that avoids the cliffs.
         }
     \vspace*{-1.0em}
 \end{figure*}

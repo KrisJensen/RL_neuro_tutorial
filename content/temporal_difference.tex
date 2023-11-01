@@ -1,7 +1,7 @@
 \section{Temporal difference learning}
 \label{sec:temporal_difference}
 
-In classical temporal-difference learning, we want to learn a \emph{value function} for a given state $s$ and policy $\pi$, which specifies the expected future reward when following $\pi$ starting from $s$:
+In classical temporal difference learning, we want to learn a \emph{value function} for a given state $s$ and policy $\pi$, which specifies the expected future reward when following $\pi$ starting from $s$:
 \begin{equation}
     \label{eq:V-values}
     V_{\pi}(s) = \mathbb{E}_{a \sim \pi} \left [ \sum_{t' = t} \gamma^{t' - t} r_{t'} | s_t = s \right ].
@@ -49,5 +49,5 @@ We can then perform action selection by choosing the action with the highest exp
     \label{eq:value_action_selection}
     a^*(s) = \text{argmax}_{a} \left ( r(s, a) + \gamma \sum_{s_{t+1}} p(s_{t+1} | s_t, a_t) V(s_{t+1}) \right ).
 \end{equation}
-Updating the value function according to \Cref{{eq:TD-learning}} while acting in the environment according to \Cref{{eq:value_action_selection}} leads to an agent that gradually learns to act better and better in the environment as it learns a better value function (\Cref{fig:TD}B-C).
+Updating the value function according to \Cref{{eq:TD-learning}} while acting in the environment according to \Cref{{eq:value_action_selection}} leads to an agent that gradually learns to take better actions as it learns a better value function (\Cref{fig:TD}B-C).
 

@@ -10,13 +10,14 @@
         The input to the agent consisted of the previous action, the pervious reward, and the time-within-trial.
         The average reward per episode is plotted against the episode number, showing that the agent gradually learns to adapt within each episode to the particular instantiation of the bandit task.
         Importantly, the parameters of the network are fixed within an episode, meaning that this adaptation occurs through the recurrent dynamics.
-        {\bfseries (B)}~Heatmap showing example behaviors in episodes with different reward probabilities for the first arm, $p(t | a = 1)$.
-        For these plots, the probability of reward from the second arm was set to $p(t | a = 2) = 1 - p(t | a = 1)$.
+        Dashed horizontal lines indicate the reward of an agent selecting random actions and an `oracle' agent that always chooses the best arm.
+        {\bfseries (B)}~Heatmap showing example behavior of the agent in episodes with different reward probabilities for the first arm, $p(r | a = 1)$.
+        For these plots, the probability of reward from the second arm was set to $p(r | a = 2) = 1 - p(r | a = 1)$.
         Across episodes, the agent experiments with different actions and eventually converges on taking the optimal action.
         For episodes with more symmetric reward probabilities (near the middle), it takes longer for the agent to identify the optimal action.
-        This balance between exploration and exploitation is mediated by the recurrent networks dynamics, which are trained over many episodes using deep reinforcement learning.
-        {\bfseries (C)}~We averaged the hidden state of the RNN across 100 episodes for different reward probabilities, ranging from high reward for action 1 (blue) to low reward for action 1 (green), and performed PCA on the resulting matrix of average hidden states for different reward probabilities.
-        This figure shows the 2-dimensional embedding of neural activity in the meta-RL agent, where we see that the agent converges to different regions of state space for different envirinments.
+        This balance between exploration and exploitation is mediated by the recurrent network dynamics, which are learned over many episodes using deep reinforcement learning.
+        {\bfseries (C)}~We averaged the hidden state of the RNN over 100 episodes for different reward probabilities, ranging from high reward for action 1 (blue) to low reward for action 1 (green), and performed PCA on the resulting matrix of average hidden states for different reward probabilities.
+        This figure shows the 2-dimensional embedding of neural activity in the meta-RL agent, where we see that the agent converges to different regions of state space for different reward probabilities.
         Crosses indicate the hidden state at the beginning of each episode.
         }
     \vspace*{-1.0em}

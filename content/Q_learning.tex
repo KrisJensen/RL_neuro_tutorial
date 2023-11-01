@@ -1,6 +1,8 @@
 \section{Q-learning}
 \label{sec:q_learning}
 
+\input{./figs_tex/_Q.tex}
+
 An alternative approach for learning to select good actions (the so-called `control problem') when we don't know the transition structure of the world is to learn the value of taking action $a$ in state $s$ instead of only learning the value of the state.
 This gives rise to `Q-learning' methods, where we learn the \emph{state-action values}
 \begin{equation}
@@ -34,16 +36,14 @@ Gradient descent w.r.t $Q(s_t,a_t)$ gives us an update rule
 \end{align}
 This is the so-called Q-learning update rule (\citealp{watkins1989learning}; \Cref{fig:Q}A), where we have again estimated the expectation over next states with the single sample actually seen by the agent.
 
-\input{./figs_tex/_Q.tex}
-
 Q-learning is guaranteed to converge to the optimal policy in the limit of infinitesimal learning rates and infinite sampling of the state-action space \citep{watkins1992q,sutton2018reinforcement}.
 However, following the greedy policy $a^*(s) = \text{argmax}_{a} Q(s, a)$ before convergence of the Q values can lead to undersampling of the state-action space and poor performance.
 It is therefore common to either use an `$\epsilon$-greedy' policy, $\pi(a|s) = \epsilon / |\mathcal{A}| + (1-\epsilon) \delta(a, a^*(s))$, or a softmax-policy, $\pi(a|s) \propto \text{exp}(\beta Q(a, s))$, to collect the experience used to update the Q values (\Cref{fig:Q}B).
 These approaches give rise to so-called `off-policy' algorithms, since the policy used in the learning update (the greedy policy) is different from the policy used for action selection (the stochastic policy).
-An on-policy version of Q-learning known as `SARSA' (state-action-reward-state-action) is also commonly used, where the Q-learning update uses the Q-value corresponding to the action $a_t$ sampled at the next timestep instead of the greedy action (\Cref{fig:Q}C):
+An on-policy version of Q-learning known as `SARSA' (state-action-reward-state-action) is also commonly used, where the Q-learning update uses the Q-value corresponding to the action $a_{t+1}$ sampled at the next timestep instead of the greedy action (\Cref{fig:Q}C):
 \begin{align}
     \Delta  Q(s_t,a_t) \propto - Q(s_t,a_t) + r_t + \gamma Q(s_{t+1}, a_{t+1}).
 \end{align}
 This will converge to the true Q values for a given policy $\pi$, similar to how the TD learning rule in \Cref{eq:TD-learning} is guaranteed to converge to the true value function for a given policy, again under assumptions of infinite sampling of the space.
-Interestingly, studies in the neuroscience literature have also found evidence for midbrain dopamine neurons encoding something like the prediction error used for Q learning \citep{roesch2007dopamine} or SARSA \citep{morris2006midbrain} in `instrumental conditioning' settings, where animals have to choose between multiple actions with different values \citep{niv2009reinforcement}.
+In `instrumental conditioning' settings, where animals have to choose between multiple actions with different values, studies have also found evidence for midbrain dopamine neurons encoding either quantities resembling the prediction error used for Q learning \citep{roesch2007dopamine,niv2009reinforcement} or SARSA \citep{morris2006midbrain,niv2009reinforcement}.
 

@@ -1,16 +1,16 @@
 \section{Deep reinforcement learning}
 \label{sec:deep_RL}
 
-So far, we have considered the setting of finite state- and action-spaces, for which we can simply learn a tabular policy.
-However, in many realistic settings, the state space is large enough that we cannot possibly enumerate all possible states and actions.
+So far, we have considered the setting of small state- and action-spaces, for which we can simply learn a tabular policy.
+However, in many realistic settings, the state space is large enough that we cannot enumerate all possible states and actions.
 In these cases, we instead have to rely on \emph{function approximation} \citep{sutton2018reinforcement}.
 This approach makes the assumption that similar states will also be associated with similar state-action value functions and should therefore have similar policies.
 By making this assumption, we can generalize to unseen states based on our previous experience, provided that our function approximator is sufficiently good.
-Recent years have seen incredible progress being made in this respect by using deep or recurrent neural networks as powerful function approximators for reinforcement learning -- the domain of `deep reinforcement learning'.
+Recent years have seen incredible progress in this setting by using deep or recurrent neural networks as powerful function approximators for reinforcement learning -- the domain of `deep reinforcement learning'.
 This approach has seen an increase in interest not just in the machine learning literature, but recently also as a model of neural dynamics and behaviour in humans and other animals \citep{wang2018prefrontal, jensen2023recurrent, makino2023arithmetic, merel2019deep, banino2018vector}.
 For a more comprehensive overview of the links between deep RL and neuroscience, we refer the interested reader to \citet{botvinick2020deep}.
-Modern approaches in deep RL can largely be divided into two categories: policy gradient methods and deep Q learning.
-In policy gradient methods, we directly train the network to output a policy, whereas deep Q networks (DQNs) output a set of state-action values which are then used for action selection.
+Modern approaches in (model-free) deep RL can largely be divided into two categories: policy gradient methods and deep Q learning.
+In policy gradient methods, we directly train the network to output a policy, whereas deep Q networks (DQNs) output a set of state-action values that can be used for action selection.
 
 \subsubsection*{Policy gradient methods}
 
@@ -22,7 +22,7 @@ A conceptually simple way to achieve this would be to define $R_\tau := \sum_{t=
     \nabla_\theta J(\theta) &= \nabla_\theta \mathbb{E}_{\tau \sim \pi_\theta} \left [ R_\tau \right ]\\
     &= \sum_{\tau} R_\tau \nabla_\theta p_\theta(\tau).
 \end{align}
-However, this requires us to know exactly how the environment will respond to our actions in order to compute the necessary derivatives, which in general we may not know (although some model-based deep RL approaches train a differentiable predictive model of the environment to do this; \citealp{clavera2020model}).
+However, this requires us to know how the environment will respond to our actions in order to compute the necessary derivatives, which in general may not be the case (although some model-based deep RL approaches train a differentiable predictive model of the environment to do this; \citealp{clavera2020model}).
 Instead, we use the `log-derivative trick', which takes advantage of the linearity of the expectation and the identity $\nabla_\theta \log f(\theta) = f(\theta)^{-1} \nabla_\theta f(\theta)$ to write
 \begin{align}
     \label{eq:deriv_J}
@@ -42,6 +42,7 @@ Inserting \Cref{eq:deriv_log_ptau} in \Cref{eq:deriv_J} and taking a Monte Carlo
                             & \approx \frac{1}{N} \sum_{\tau \sim \pi_\theta} \left ( \sum_{t=0}^T \gamma^t r_t \right ) \left ( \sum_{t=0}^T \nabla_\theta \log \pi_\theta (a_t|s_t) \right ).
     \label{eq:orig_reinforce}
 \end{align}
+Intuitively, \Cref{eq:orig_reinforce} says that we should preferentially upregulate the probability of trajectories with high reward, which will lead to downregulation of trajectories with lower reward due to the normalization of the policy.
 Importantly, \Cref{eq:orig_reinforce} no longer requires us to differentiate through the environment -- only the policy.
 
 While the REINFORCE algorithm is unbiased, it also has high variance, which can make learning slow and unstable.
@@ -68,8 +69,10 @@ A common choice here is the expected future reward
 \end{equation}
 This gives rise to the so-called `actor-critic' algorithm
 \begin{equation}
+    \label{eq:AC}
     \nabla_\theta J(\theta) \approx \frac{1}{N} \sum_{\tau \sim \pi_\theta}  \sum_{t=0}^T (R_t - V(s_t)) \nabla_\theta \log \pi_\theta (a_t|s_t).
 \end{equation}
+Intuitively, \Cref{eq:AC} says that we should upregulate the probability of actions that lead to higher-than-expected reward and downregulate the probability of actions that lead to lower-than-expected reward.
 Interestingly, many studies in the neuroscience literature have suggested that the brain could be using something akin to an actor-critic algorithm, with dorsal striatum implementing the `actor' and ventral striatum the `critic' \citep{takahashi2008silencing,sutton2018reinforcement}.
 
 Finally, it is common to reduce the variance of our gradient estimator through an approach known as `bootstrapping'.
@@ -77,17 +80,17 @@ To implement this, we note that
 \begin{equation}
     \mathbb{E} \left [ R_t \right ] = \mathbb{E}[r_t + \gamma V(s_{t+1})].
 \end{equation}
-This is interesting because $r_t + \gamma V(s_{t+1})$ has lower variance than $R_t$, so using this bootstrapped estimate of the reward-to-go can reduce the noise in our gradient estimate when using finite sample sizes.
+This is useful because $r_t + \gamma V(s_{t+1})$ has lower variance than $R_t$, so using this bootstrapped estimate of the reward-to-go can reduce the noise in our gradient estimate when using finite sample sizes.
 We therefore use $r_t + \gamma V(s_{t+1})$ to define the `advantage function' $A_t = r_t + \gamma V(s_{t+1}) - V(s_t)$, which gives rise to the `advantage actor critic' (A2C) algorithm:
 \begin{equation}
     \nabla_\theta J(\theta) \approx \frac{1}{N} \sum_{\tau \sim \pi_\theta}  \sum_{t=0}^T (r_t + \gamma V(s_{t+1}) - V(s_t)) \nabla_\theta \log \pi_\theta (a_t|s_t).
 \end{equation}
-While we have considered two extreme cases of a full Monte-Carlo sample of $R_t$ and a `one-step' bootstrap, the sum in $R_t$ can be truncated to any order with $R_{t'}$ replaced by $V(s_{t'})$.
+While we have considered two extreme cases of a full Monte-Carlo estimate of $R_t$ and a `one-step' bootstrap, the sum in $R_t$ can be truncated to any order with $R_{t'}$ replaced by $V(s_{t'})$.
 In theory, this estimator remains unbiased if our value function is unbiased.
-However, in practice the estimate of $V(s_t)$ learned by our critic will be inexact, which introduces a bias to our parameter updates.
-The bootstrapping procedure outlined above thus leads to a tradeoff between the bias and variance of our update step, and the optimal tradeoff will depend on the problem setting, network architecture, and training paradigm being used.
+However, in practice the estimate of $V(s_{t'})$ learned by our critic will be inexact, which introduces a bias to our parameter updates.
+The bootstrapping procedure outlined above thus leads to a tradeoff between the bias and variance of our parameter updates, and the optimal tradeoff will depend on the problem setting, network architecture, and training paradigm being used.
 
-For the A2C algorithm outlined above, it is common to parameterize both the policy $\pi_\theta(a_t|s_t)$ and the value function $V_\phi(s_t)$ with neural networks -- often with a subset of shared parameters between $\theta$ and $\phi$.
+For these actor critic algorithms, it is common to parameterize both the policy $\pi_\theta(a_t|s_t)$ and the value function $V_\phi(s_t)$ with neural networks -- often with a subset of shared parameters between $\theta$ and $\phi$.
 This leaves the problem of updating the parameters.
 In order to use out-of-the-box automatic differentiation software, we do this by defining an auxiliary utility (i.e. negative loss)
 \begin{equation}
@@ -99,16 +102,17 @@ While $\tilde{J}(\theta)$ has no intrinsic interpretation, it is chosen such tha
     \nabla_\theta \tilde{J}(\theta) = \nabla_\theta J(\theta).
 \end{equation}
 
-The gradient of the value function loss is given by
+The gradient of the value function loss (i.e. negative utility) is given by
 \begin{equation}
-    \nabla_\phi \mathcal{L}_V = \nabla_\phi \sum_t \frac12  (V_\phi(s_t) - R_t)^2 = \sum_t (V_\phi(s_t) - R_t) \nabla_\phi V_\phi(s_t).
+    \nabla_\phi \mathcal{L}_V = \nabla_\phi \sum_t \frac12  (R_t - V_\phi(s_t))^2 = \sum_t - (R_t - V_\phi(s_t)) \nabla_\phi V_\phi(s_t).
 \end{equation}
-When $\pi_\theta$ and $V_\phi$ share parameters, we also need to balance these the gradients w.r.t. $\theta$ and $\phi$ in our update step.
-We do this by defining $\delta_t := R_t - V(s_t)$, where $R_t$ can optionally be the bootstrapped estimate $r_t + \gamma V(s_{t+1})$, introducing a hyperparameter $\beta_V$, and maximizing the utility
+When $\pi_\theta$ and $V_\phi$ share parameters, we also need to balance the gradients w.r.t. $\theta$ and $\phi$ in our update step.
+We do this by defining $\delta_t := R_t - V(s_t)$, where $R_t$ can optionally be the bootstrapped estimate $r_t + \gamma V(s_{t+1})$, introducing a hyperparameter $\beta_V$, and maximizing the joint utility
 \begin{equation}
     \mathcal{L} = \frac{1}{N} \sum_{\tau \sim \pi_\theta} \sum_{t=0}^T ( \log \pi_\theta (a_t|s_t) + \beta_V V_\phi(s_t) ) \delta_t .
 \end{equation}
 Importantly, we do not propagate gradients w.r.t. $\phi$ or $\theta$ through the computation of $\delta_t$.
+Finally, it is also common to add an auxiliary entropy loss of the form $\mathcal{L}_E = \beta_E \frac{1}{N} \sum_{\tau \sim \pi_\theta} \sum_{t=0}^T \sum_a \pi_\theta (a_t|s_t) \log \pi_\theta (a_t|s_t)$ to encourage exploration.
 
 While these policy gradient methods may seem far removed from neuroscience, they have recently attracted significant interest as models of learning and neural dynamics in the biological brain \citep{wang2018prefrontal, jensen2023recurrent, merel2019deep}.
 Of particular interest, \citet{wang2018prefrontal} suggested that frontal cortex can be well described as a \emph{recurrent} deep RL agent, where the RNN parameters are configured by learning from rewards over long periods of time from many tasks that have a shared underlying structure.
@@ -121,7 +125,7 @@ This process, whereby an agent trained slowly on a large distribution of tasks c
     \item The emergence of `model-based' behaviour in the `two-step' task commonly used to distinguish between model-free and model-based RL \citep{miller2017dorsal,daw2011model}.
     \item The ability of animals to get progressively faster at learning when exposed to multiple tasks with a consistent abstract task structure \citep{harlow1949formation}.
 \end{itemize}
-Recently, \citet{jensen2023recurrent} also extended the work of \citet{wang2018prefrontal} to allow the meta-RL agent to learn not just from physical experience but also from imagined experience using a learned model of the environment.
+Recently, \citet{jensen2023recurrent} also extended the work of \citet{wang2018prefrontal} to allow the meta-RL agent to learn not just from physical experience, but also from imagined experience using a learned model of the environment.
 This resulted in an agent that computes an intial model-free policy, which can be adaptively improved with model-based computations when the resulting policy improvement makes up for the temporal opportunity cost of the model-based computation.
 Interestingly, the response times of the resulting agent mirrored those of human participants in a maze navigation task, where the agent similarly spent more time `thinking' early in a trial and far from the goal.
 
@@ -129,7 +133,7 @@ Interestingly, the response times of the resulting agent mirrored those of human
 
 \subsubsection*{Deep Q-learning}
 
-While the policy gradient methods discussed above are useful, they have a couple of shortcomings.
+While the policy gradient methods discussed above are useful, they also have limitations.
 One is that most policy gradient methods are fundamentally `on-policy', which means that the data used for learning must be sampled from the agent itself.
 This is necessary for the log derivative trick to work.
 Another is that the gradient can have fairly high variance despite all of our variance reduction efforts.
@@ -150,10 +154,10 @@ The above steps can either be run `online' using the experience of the agent as 
 The `max' in the target value ensures that we continuously improve our policy.
 When acting according to our policy, we simply pick the action predicted to have the highest value, usually using some variant of $\epsilon$-greedy or softmax to introduce stochasticity and variability into our trajectories.
 
-On the surface, the above looks like a straightforward generalization of tabular Q-learning, and it may seem surprising that deep Q-learning did not see significant use or success until \citet{mnih2013playing}.
+On the surface, the above looks like a straightforward generalization of tabular Q-learning, and it may seem surprising that deep Q-learning did not see significant use or success until the foundational work of \citet{mnih2013playing}.
 However, a major difficulty arises from the autocorrelation of the states observed by the agent, which leads to the network `chasing' a target function $(r_t + \gamma \text{max}_a Q_\theta(s_{t+1}, a))$ that changes with the environment.
 A critical advance that overcame the resulting instability was the use of an experience replay buffer, whereby the experience generated by the agent is added to a global replay buffer $\mathcal{B}$.
-A \emph{random} experience is then sampled from the buffer and used to update the network parameters.
+One or more \emph{random} experiences are then sampled from the buffer and used to update the network parameters -- reminiscent of the `DYNA' architecture described previously.
 An additional algorithmic instability arises from the fact that $\mathcal{L}$ includes the term $\text{max}_a Q_\theta(s_{t+1}, a)$, which we cannot take gradients through despite its dependence on $\theta$.
 This means that we are trying to optimize our parameters for a continuously moving target, which destabilitizes the optimization process.
 To combat this, it is common to use a `target network' $Q_{\theta'}(s_{t+1}, a)$ that is fixed for a period of time, usually after being set to a copy of our `student network'.
@@ -174,6 +178,6 @@ Commonly, this is done by simply using the student network for action selection 
 
 While DQNs have shown impressive performance across a range of machine learning settings \citep{mnih2013playing, lillicrap2015continuous, schaul2015prioritized, kalashnikov2018qt}, they have seen less interest from the neuroscience community.
 This is perhaps paradoxical given the prevalence of tabular Q-learning in the theoretical neuroscience literature.
-An interesting exception to this is recent work by \citet{makino2023arithmetic}, which shows parallels between the values learned in a DQN and neural  representations in mammalian cortex during a compositional behavioural task.
+An interesting exception to this is recent work by \citet{makino2023arithmetic}, which shows parallels between the values learned by a DQN and neural representations in mammalian cortex during a compositional behavioural task.
 Additionally, the importance of experience replay in DQNs \citep{mnih2013playing, schaul2015prioritized} has close parallels to the proposal that hippocampal replay constitutes a form of experience replay \citep{mattar2018prioritized} -- although the latter was only analyzed in a tabular setting.
 
