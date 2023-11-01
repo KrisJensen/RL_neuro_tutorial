@@ -113,7 +113,7 @@ Importantly, we do not propagate gradients w.r.t. $\phi$ or $\theta$ through the
 While these policy gradient methods may seem far removed from neuroscience, they have recently attracted significant interest as models of learning and neural dynamics in the biological brain \citep{wang2018prefrontal, jensen2023recurrent, merel2019deep}.
 Of particular interest, \citet{wang2018prefrontal} suggested that frontal cortex can be well described as a \emph{recurrent} deep RL agent, where the RNN parameters are configured by learning from rewards over long periods of time from many tasks that have a shared underlying structure.
 Importantly, this `slow' model-free learning process gives rise to an agent that can rapidly learn from experience with \emph{fixed parameters} when exposed to a new task from the same distribution.
-This is achieved by the agent learning to effectively implement a fast RL-like algorithm in the \emph{dynamics} of the network.
+This is achieved by the agent learning to effectively implement a fast RL-like algorithm in the \emph{dynamics} of the network (\Cref{fig:meta}).
 This process, whereby an agent trained slowly on a large distribution of tasks can rapidly adapt to a new task, is known as `meta-reinforcement learning' and is a popular area of research in machine learning \citep{finn2017model, ritter2018been, duan2016rl, wang2016learning}.
 \citet{wang2018prefrontal} showed that such as meta-RL model can explain a range of neuroscientific findings, including
 \begin{itemize}

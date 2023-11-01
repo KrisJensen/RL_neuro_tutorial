@@ -6,8 +6,8 @@ Such algorithms do not require much computation at decision time, where there is
 However, it can require a lot of experience with the environment to learn these model-free policies, and they can be very inflexible in changing environments.
 
 On the other hand, `model-based' reinforcement learning uses a model of the world to simulate the consequences of different actions at decision time.
-This can be much more data efficient, since learning a world model is often simpler than learning a full policy.
-However, model-based decision making can also be computationally intensive at decision-time in complicated state spaces.
+This can be much more data efficient, since learning a world model is often simpler than learning a full policy (\Cref{fig:MB}A).
+However, model-based decision making can also be computationally intensive at decision-time in complicated state spaces (\Cref{fig:MB}B).
 Such models have recently exhibited impressive performance across a range of RL settings with large state spaces, including atari, chess, shogi, and Go \citep{silver2018general, schrittwieser2020mastering, deisenroth2011pilco}.
 
 In model-based RL, experience is used to learn a transition-and-reward function $p(s_{t+1}, r_t | s_t, a_t)$ from past experience.

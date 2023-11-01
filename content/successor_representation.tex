@@ -28,7 +28,7 @@ We can now compute the expected reward associated with each state under the new 
 \begin{equation}
     \b{v}_\pi' = \b{M}^\pi \b{r}'.
 \end{equation}
-Of course this new value function will lead to us eventually changing our policy and having to update $\b{M}$, but it provides a much better starting point than using the wrong policy \emph{and} value function as in standard temporal-difference learning.
+Of course this new value function will lead to us eventually changing our policy and having to update $\b{M}$, but it provides a much better starting point than using the wrong policy \emph{and} value function as in standard temporal-difference learning (\Cref{fig:MB}C).
 Additionally, it has the appealing feature that the successor matrix can be learned by simple temporal-difference learning when transitioning from $s_t$, analogous to \Cref{eq:TD-learning}:
 \begin{equation}
     \Delta M_{s_t s'} \propto -M_{s_t s'} + \delta(s_t, s') + \gamma M_{s_{t+1} s'}.
@@ -44,7 +44,7 @@ In this model, the firing of a place cell in a given location $s$ reflects the e
 While the SR is perhaps the most prominent model in systems neuroscience that combines features of model-free and model-based RL, it is not the only one.
 Another interesting approach that has found parallels in the neuroscience literature is the `DYNA' architecture of \citet{sutton1991dyna}.
 In this framework, a model of the world is learned from experience and used to train a model-free policy offline by bootstrapping imagined experience sampled from the model.
-This allows for more data-efficient learning of model-free policies at the cost of additional compute during `rest' but without necessarily needing more compute at decision time, in contrast to the model-based approaches discussed previously.
+This allows for more data-efficient learning of model-free policies at the cost of additional compute during `rest' but without necessarily needing more compute at decision time, in contrast to the model-based approaches discussed previously (\Cref{fig:MB}D).
 The model used to simulate data for offline training can either be an explicit learned world model, or it can simply be a memory buffer of past experiences in the form of $(s_t, a_t, r_t, s_{t+1}, a_{t+1})$ tuples.
 Such experience replay has proven crucial to the success of modern deep reinforcement learning agents by allowing for higher data efficiency and reducing the instability arising from the autocorrelated nature of online experience \citep{mnih2013playing,schaul2015prioritized}.
 A prominent theory in neuroscience suggests that hippocampal replays could be implementing such a DYNA-like algorithm by generating imagined experience used to train the model-free RL systems of the brain \citep{mattar2018prioritized}.

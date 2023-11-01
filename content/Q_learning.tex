@@ -32,15 +32,15 @@ Gradient descent w.r.t $Q(s_t,a_t)$ gives us an update rule
     &\propto - Q(s_t,a_t) + r(s_t, a_t) + \gamma \mathbb{E}_{s_{t+1} \sim p(s_{t+1} | s_t, a_t)} \left [ \text{max}_{a_{t+1}} Q(s_{t+1}, a_{t+1}) \right ] \\
     &\approx - Q(s_t,a_t) + r_t + \gamma \text{max}_{a_{t+1}} Q(s_{t+1}, a_{t+1}).
 \end{align}
-This is the so-called Q-learning update rule \citep{watkins1989learning}, where we have again estimated the expectation over next states with the single sample actually seen by the agent.
+This is the so-called Q-learning update rule (\citealp{watkins1989learning}; \Cref{fig:Q}A), where we have again estimated the expectation over next states with the single sample actually seen by the agent.
 
 \input{./figs_tex/_Q.tex}
 
-Q-learning is guaranteed to converge to the true Q-values in the limit of infinitesimal learning rates and infinite sampling of the state-action space \citep{watkins1992q,sutton2018reinforcement}.
+Q-learning is guaranteed to converge to the optimal policy in the limit of infinitesimal learning rates and infinite sampling of the state-action space \citep{watkins1992q,sutton2018reinforcement}.
 However, following the greedy policy $a^*(s) = \text{argmax}_{a} Q(s, a)$ before convergence of the Q values can lead to undersampling of the state-action space and poor performance.
-It is therefore common to either use an `$\epsilon$-greedy' policy, $\pi(a|s) = \epsilon / |\mathcal{A}| + (1-\epsilon) \delta(a, a^*(s))$, or a softmax-policy, $\pi(a|s) \propto \text{exp}(\beta Q(a, s))$, to collect the experience used to update the Q values.
+It is therefore common to either use an `$\epsilon$-greedy' policy, $\pi(a|s) = \epsilon / |\mathcal{A}| + (1-\epsilon) \delta(a, a^*(s))$, or a softmax-policy, $\pi(a|s) \propto \text{exp}(\beta Q(a, s))$, to collect the experience used to update the Q values (\Cref{fig:Q}B).
 These approaches give rise to so-called `off-policy' algorithms, since the policy used in the learning update (the greedy policy) is different from the policy used for action selection (the stochastic policy).
-An on-policy version of Q-learning known as `SARSA' (state-action-reward-state-action) is also commonly used, where the Q-learning update uses the Q-value corresponding to the action $a_t$ sampled at the next timestep instead of the greedy action:
+An on-policy version of Q-learning known as `SARSA' (state-action-reward-state-action) is also commonly used, where the Q-learning update uses the Q-value corresponding to the action $a_t$ sampled at the next timestep instead of the greedy action (\Cref{fig:Q}C):
 \begin{align}
     \Delta  Q(s_t,a_t) \propto - Q(s_t,a_t) + r_t + \gamma Q(s_{t+1}, a_{t+1}).
 \end{align}

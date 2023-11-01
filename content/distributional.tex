@@ -29,7 +29,7 @@ Importantly, a distribution is uniquely specified by its expectiles, and we can 
 Translating this to an RL algorithm involves training a network (or tabular values) to predict a set of expectiles for a given state (and action).
 The parameters of the agent are then updated by propagating the distribution implied by the predicted expectiles through a `Bellman equation', similar to \Cref{eq:value_expansion} or \Cref{eq:Q-optimal}, and minimizing the difference between the initial and propagated distributions.
 
-In the tabular value learning case (c.f. \Cref{sec:temporal_difference}), this turns out to be particularly simple do via the use of a modified TD-update rule (c.f. \Cref{eq:TD-learning}; \citealp{lowet2020distributional}).
+In the tabular value learning case (c.f. \Cref{sec:temporal_difference}), this turns out to be particularly simple do via the use of a modified TD-update rule (c.f. \Cref{eq:TD-learning}; \citealp{lowet2020distributional}; \Cref{fig:dist}A).
 In particular, we consider a set of atoms $\{ V_i \}$, each representing expectile $\tau_i := \frac{\alpha_i^+}{\alpha_i^+ + \alpha_i^-}$ of the value distribution $p_\pi(Z(s))$ (where $\mathbb{E}_{ p_\pi(Z(s))} \left [ Z(s) \right ] = V(s)$).
 These expectiles can be learned by sampling experience from the environment under the policy and defining a TD error for each atom and state transition as
 \begin{align}
@@ -52,12 +52,12 @@ In particular, \citet{dabney2020distributional} recorded the activity of dopamin
 More concretely, they showed that:
 \begin{itemize}
     \item The VTA neurons exhibited a range of different `reversal points' -- defined as the reward magnitude at which the firing rate of a neuron did not change from its baseline firing rate.
-    This is consistent with a distributional RL theory, where neurons correspond to the TD updates considered above, since the reversal point of a neuron $i$ should in this case be $\epsilon_{\tau_i}$.
+    This is consistent with a distributional RL theory, where neurons correspond to the TD updates considered above, since the reversal point of a neuron $i$ should in this case be $\epsilon_{\tau_i}$ (\Cref{fig:dist}B).
     \item Neurons had different slopes describing the relationship between expected reward and firing rate in the regimes where expected reward was above and below the reversal point of each neuron.
-    This is consistent with the algorithm described in \Cref{eq:DRL_V_expec}.
+    This is consistent with the algorithm described in \Cref{eq:DRL_V_expec} (\Cref{fig:dist}B).
     \item When independently fitting a slope to the data above ($\alpha_i^+$) and below ($\alpha_i^-$) the reversal point of neuron $i$, the reversal point of the neuron was positively correlated with $\frac{\alpha_i^{+}}{\alpha_i^- + \alpha_i^+}$.
-    This is consistent with the expectile distributional RL setting, where the reversal point is $\epsilon_\tau = \frac{\alpha^{+}}{\alpha^- + \alpha^+}$.
-    \item When fitting a distribution to be maximally similar to the distribution implied by the VTA neurons when interpreted as expectiles, the resulting fit was remarkably similar to the distribution learned by a simulated distributional RL agent.
+    This is consistent with the expectile distributional RL setting, where the reversal point is $\epsilon_\tau = \frac{\alpha^{+}}{\alpha^- + \alpha^+}$ (\Cref{fig:dist}B).
+    \item When fitting a distribution to be maximally similar to the distribution implied by the VTA neurons when interpreted as expectiles (\Cref{fig:dist}C), the resulting fit was remarkably similar to the distribution learned by a simulated distributional RL agent.
 \end{itemize}
 These findings generalize the canonical RPE view of \citet{schultz1997neural}, which can be seen as the neuron-averaged version of the theory put forward by \citet{dabney2020distributional}.
 While the expectile regression algorithm investigated by \citet{dabney2020distributional} relies on non-linear `imputation' of the distribution and non-local TD updates, recent work has suggested more biologically plausible distributional RL updates consistent with the biological data \citep{tano2020local}.
