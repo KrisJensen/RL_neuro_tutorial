@@ -7,20 +7,20 @@
         {\bfseries Distributional reinforcement learning.}
         The results in this figure reproduce some of the key simulations of \citet{dabney2020distributional}.
         These simulations were all run on a simple value estimation task with a single state and no actions.
-        {\bfseries (A)}~Distribution of rewards (black), plotted together with the values converged to across 20 units all learning through standard TD learning (blue), and the expectiles converged to across 20 units learning with distributional RL using different $\tau_i = \frac{\alpha_i^+}{\alpha_i^+ + \alpha_i^-}$ (green).
+        {\bfseries (A)}~Distribution of rewards (black), plotted together with the values $V_i$ converged to across 20 units all learning through standard TD learning (blue), or through distributional RL with different $\tau_i = \frac{\alpha_i^+}{\alpha_i^+ + \alpha_i^-}$ (green).
         The TD units all converge to the mean reward, while the expectile units end up tiling the distribution.
         {\bfseries (B)}~For both the TD units and distributional units from (A), we plot the temporal difference updates performed in response to different rewards from the reward distribution.
-        These updates have been proposed to be represented in the firing rate of dopaminergic VTA neurons \citep{schultz1997neural,dabney2020distributional}.
+        These updates have been proposed to be represented in the firing rates of dopaminergic VTA neurons relative to baseline \citep{schultz1997neural,dabney2020distributional}.
         The TD units show a constant linear scaling across positive and negative rewards, while the distributional units show an asymmetric scaling of firing rate with reward magnitude above and below their reversal point (black horizontal line).
         The ratio of slopes above and below the reversal point scales positively with the value of the reversal point.
         These features of dopaminergic VTA neurons were used by \citet{dabney2020distributional} to argue that the brain implements a form of distributional RL.
         {\bfseries (C)}~True reward distribution (black) reproduced from (A), now plotted together with the reward distribution implied by the distributional units from (A) and (B) at different stages of learning (light to dark green).
-        These imputed distributions were computed by \emph{assuming} that the value learned by unit $i$ corresponds to the expectile $\tau_i = \frac{\alpha_i^+}{\alpha_i^+ + \alpha_i^-}$.
-        We then impute the distribution implied by these expectiles by assuming it takes the form of a set of $N$ delta functions in the case of $N$ expectiles \citep{rowland2019statistics}.
+        These imputed distributions were computed by \emph{assuming} that the value $V_i$ learned by unit $i$ corresponds to expectile $\tau_i = \frac{\alpha_i^+}{\alpha_i^+ + \alpha_i^-}$ of the reward distribution.
+        We then impute the distribution implied by these expectiles under the assumption that it consists of a set of $N$ delta functions in the case of $N$ expectiles \citep{rowland2019statistics}.
         Finally, we convolved the resulting delta functions with a Gaussian kernel ($\sigma = 0.1$) for visualization.
-        This whole process was repeated using the expectiles represented in the population at different stages of learning.
+        This whole process was repeated using $\{V_i\}$ at different stages of learning.
         The units were all initialized at $V_i = 0.5$, so the initial distribution is a delta function at $r = 0.5$.
-        However, at the end of learning, the population faithfully represents the true reward distribution, capturing key features including bimodality and the relative magnitude of the two different modes.
+        At the end of learning, the population faithfully represents the true reward distribution, capturing key features including bimodality and the relative magnitude of the two different modes.
         \citet{dabney2020distributional} used a similar approach to infer the distribution implicitly encoded by dopaminergic VTA neurons at the end of animal training and found a close match to the true reward distribution.
         }
     \vspace*{-1.0em}

@@ -8,7 +8,7 @@
         {\bfseries (A)}~Illustration of the reinforcement learning problem.
         An agent (the chick) has to interact with the world to maximize its lifetime reward.
         This involves a balance between exploring potentially interesting states (e.g. learning to fly) while also exploiting states known to yield high reward (e.g. sitting in the nest and eating food brought back by its parents).
-        At any given point in time, the chick is in some state $s_t$ from which it can take an action $a_t$, with the probability of different actions determined by the `policy' $\pi(a|s_t)$, which is determined by the agent.
+        At any given point in time, the chick is in some state $s_t$ from which it can take an action $a_t$, with the probability of different actions determined by the `policy' $\pi(a|s_t)$, which is controlled by the agent.
         $a_t$ then leads to a change in the environment according the non-controllable environment dynamics $s_{t+1}, a_t \sim p(s_{t+1}, r_t | s_t, a_t)$.
         Here, $r_t$ is the empirical `reward' received by the agent, and its objective is to collect as much cumulative reward as possible.
         Often, reinforcement learning problems are divided into `episodes', with the agent learning over the course of multiple repeated exposures to the environment.

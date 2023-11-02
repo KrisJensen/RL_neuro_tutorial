@@ -14,35 +14,36 @@ Clearly, the expectation of samples from $Z$ equal the corresponding Q value:
 \end{equation}
 However, instead of estimating this expectation, we now want to learn the full distribution of returns under our policy $\pi$, $p_\pi(Z(s, a))$.
 One use of learning this distribution is to develop methods which are risk averse \citep{morimura2010nonparametric,morimura2012parametric} or explicitly take into account uncertainty \citep{dearden1998bayesian}.
-However, recent work has suggested that such a distributional approach can also lead to improved performance in terms of expected rewards by improving the learning dynamics in the tabular setting and by improving representation learning in the deep RL setting \citep{bellemare2017distributional,dabney2018distributional,rowland2019statistics,bellemare2023distributional}.
+However, recent work has suggested that such a distributional approach can also lead to improved performance in terms of expected rewards by improving representation learning in the deep RL setting \citep{bellemare2017distributional,dabney2018distributional,rowland2019statistics,bellemare2023distributional}.
 
 To learn $p_\pi(Z(s, a))$, one option is to define a set of `atoms' that tile the (expected) support of the distribution and then discretize the distribution by assigning the full probability mass to these discrete locations.
-$p_\pi(Z(s, a))$ can then be iteratively improved using temporal differences by propagating each atom using the Bellman equation (\Cref{eq:Q-optimal}), projecting the density back onto the discretized locations, and training our RL agent to predict the corresponding probabilities.
+$p_\pi(Z(s, a))$ can then be iteratively improved using temporal differences by propagating each atom through the Bellman equation (\Cref{eq:Q-optimal}), projecting the density back onto the discretized locations, and training an RL agent to predict the corresponding probabilities.
 This is the approach originally employed by \citet{bellemare2017distributional}.
-However, it turns out to be more convenient from a neuroscientific perspective to instead represent a different set of sufficient statistics for $p_\pi(Z(s, a))$ \citep{dabney2020distributional,lowet2020distributional}.
+However, it turns out to be more convenient from a neuroscientific perspective to represent a different set of sufficient statistics for $p_\pi(Z(s, a))$ \citep{dabney2020distributional,lowet2020distributional}.
 We do this by defining the $\tau\textsuperscript{th}$ \emph{expectile} of $p_\pi(Z(s, a))$, $\epsilon_\tau$, which is defined for a random variable $Z$ as the solution to the equation
 \begin{equation}
     \tau \mathbb{E} [\text{max}(0, Z - \epsilon_\tau)] = (1-\tau) \mathbb{E} [\text{max}(0, \epsilon_\tau - Z)].
 \end{equation}
 This is a generalization of the mean, which is recovered for $\tau = 0.5$, and is similar to how the quantile generalizes the notion of a median.
-Importantly, a distribution is uniquely specified by its expectiles, and we can therefore represent $p_\pi(Z(s, a))$ in terms of its expectiles.
+A distribution is uniquely specified by its expectiles, and we can therefore represent $p_\pi(Z(s, a))$ in terms of $\{\epsilon_\tau\}$.
 Translating this to an RL algorithm involves training a network (or tabular values) to predict a set of expectiles for a given state (and action).
-The parameters of the agent are then updated by propagating the distribution implied by the predicted expectiles through a `Bellman equation', similar to \Cref{eq:value_expansion} or \Cref{eq:Q-optimal}, and minimizing the difference between the initial and propagated distributions.
+The parameters of the agent are then updated by propagating the distribution implied by the predicted expectiles through the Bellman equation and minimizing the difference between the initial and propagated distributions.
 
 In the tabular value learning case (c.f. \Cref{sec:temporal_difference}), this turns out to be particularly simple do via the use of a modified TD-update rule (c.f. \Cref{eq:TD-learning}; \citealp{lowet2020distributional}; \Cref{fig:dist}A).
-In particular, we consider a set of atoms $\{ V_i \}$, each representing expectile $\tau_i := \frac{\alpha_i^+}{\alpha_i^+ + \alpha_i^-}$ of the return distribution $p_\pi(Z(s))$ (where $Z(s) = \mathbb{E}_{a \sim \pi(a|s)} Z(a, s)$).
-These expectiles can be learned by sampling experience from the environment under the policy and defining a TD error for each atom and state transition as
+In particular, we consider a set of units $\{ V_i(s) \}$, each with a target expectile $\tau_i := \frac{\alpha_i^+}{\alpha_i^+ + \alpha_i^-}$ of the return distribution $p_\pi(Z(s))$ (where $Z(s) = \mathbb{E}_{a \sim \pi(a|s)} Z(a, s)$).
+These expectiles can be learned by sampling experience from the environment under the policy and defining a TD error for each unit and state transition as
 \begin{align}
     \delta_i := r_t + \gamma V_j(s_{t+1}) - V_i(s_t).
 \end{align}
-Here $V_j(s_{t+1})$ is a \emph{random sample} from  $p_\pi(Z(s_{t+1}))$ \citep{lowet2020distributional,dabney2020distributional}.
-We then apply the following update rule to all atoms:
+Here, $V_j(s_{t+1})$ is a \emph{random sample} from  $p_\pi(Z(s_{t+1}))$ \citep{lowet2020distributional,dabney2020distributional}.
+We then apply the following update rule to all units:
 \begin{equation}
     \label{eq:DRL_V_expec}
     \Delta V_i(s_t) = \alpha_i^+ \text{max}(\delta_i, 0 ) + \alpha_i^- \text{min}(\delta_i, 0).
 \end{equation}
-In other words, we apply the TD update rule to each atom with learning rate $\alpha_i^+$ for positive TD errors and learning rate $\alpha_i^-$ for negative TD errors.
-Another variant of this algorithm updates each atom with $\alpha_i \text{sign}(\delta_i)$ instead of $\alpha_i (\delta_i)$, which leads to learning of the \emph{quartiles} of the distribution instead of the expectiles.
+In other words, we apply the TD update rule to each unit with learning rate $\alpha_i^+$ for positive TD errors and learning rate $\alpha_i^-$ for negative TD errors.
+When running this algorithm to convergence, $V_i(s)$ will approach the $\tau_i\textsuperscript{th}$ expectile ($\epsilon_{\tau_i}$) of $p_\pi(Z(s))$.
+Another variant of this algorithm updates each unit with $\alpha_i \text{sign}(\delta_i)$ instead of $\alpha_i (\delta_i)$, which leads to learning of the $\tau_i\textsuperscript{th}$ \emph{quartiles} of the distribution instead of the expectiles.
 We refer to \citet{bellemare2017distributional,dabney2018distributional,rowland2019statistics,bellemare2023distributional}; and \citet{dabney2020distributional} for additional mathematical details and extensions to the control and deep RL settings.
 
 \input{./figs_tex/_dist.tex}
@@ -52,12 +53,13 @@ In particular, \citet{dabney2020distributional} recorded the activity of dopamin
 More concretely, they showed that:
 \begin{itemize}
     \item The VTA neurons exhibited a range of different `reversal points' -- defined as the reward magnitude at which the firing rate of a neuron did not change from its baseline firing rate.
-    This is consistent with a distributional RL theory, where neurons correspond to the TD updates considered above, since the reversal point of a neuron $i$ should in this case be $\epsilon_{\tau_i}$ (\Cref{fig:dist}B).
-    \item Neurons had different slopes describing the relationship between expected reward and firing rate in the regimes where expected reward was above and below the reversal point of each neuron.
+    This is consistent with a distributional RL theory, where the change in neural firing rates from baseline correspond to the expectile TD updates considered above.
+    In this case, the reversal point of a neuron $i$ should be $V_i \approx \epsilon_{\tau_i}$ (\Cref{fig:dist}B).
+    \item Neurons had different slopes describing the relationship between expected reward and firing rate in the regimes where expected reward was above and below the reversal point ($V_i$) of each neuron.
     This is consistent with the algorithm described in \Cref{eq:DRL_V_expec} (\Cref{fig:dist}B).
-    \item When independently fitting a slope to the data above ($\alpha_i^+$) and below ($\alpha_i^-$) the reversal point of neuron $i$, the reversal point of the neuron was positively correlated with $\frac{\alpha_i^{+}}{\alpha_i^- + \alpha_i^+}$.
-    This is consistent with the expectile distributional RL setting, where the reversal point is $\epsilon_\tau = \frac{\alpha^{+}}{\alpha^- + \alpha^+}$ (\Cref{fig:dist}B).
-    \item When `imputing' the distribution (approximated as a set of delta functions) implied by the VTA neurons when interpreted as expectiles (\Cref{fig:dist}C), the resulting fit was remarkably similar to the distribution learned by a simulated distributional RL agent.
+    \item When independently fitting a slope to the data above ($\alpha_i^+$) and below ($\alpha_i^-$) the reversal point of neuron $i$, the reversal point of the neuron was positively correlated with $\tau_i = \frac{\alpha_i^{+}}{\alpha_i^- + \alpha_i^+}$.
+    This is consistent with the expectile distributional RL setting, where the reversal point is $V_i \approx \epsilon_{\tau_i}$ (\Cref{fig:dist}B).
+    \item When `imputing' the distribution (approximated as a set of delta functions) implied by the VTA neurons when interpreted as expectiles (\Cref{fig:dist}C), the resulting fit was remarkably similar to the true distribution of rewards in the experiment.
 \end{itemize}
 These findings generalize the canonical RPE view of \citet{schultz1997neural}, which can be seen as the averaged version of the theory put forward by \citet{dabney2020distributional}.
-While the expectile regression algorithm investigated by \citet{dabney2020distributional} relies on non-linear `imputation' of the implied return distribution and non-local TD updates, recent work has suggested more biologically plausible distributional RL updates consistent with the biological data \citep{tano2020local}.
+While the expectile regression algorithm investigated by \citet{dabney2020distributional} relies on non-linear `imputation' of the implied return distribution and non-local TD updates, recent work has suggested more biologically plausible distributional RL updates that are also consistent with the biological data \citep{tano2020local}.
