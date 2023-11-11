@@ -30,12 +30,12 @@ Translating this to an RL algorithm involves training a network (or tabular valu
 The parameters of the agent are then updated by propagating the distribution implied by the predicted expectiles through the Bellman equation and minimizing the difference between the initial and propagated distributions.
 
 In the tabular value learning case (c.f. \Cref{sec:temporal_difference}), this turns out to be particularly simple do via the use of a modified TD-update rule (c.f. \Cref{eq:TD-learning}; \citealp{lowet2020distributional}; \Cref{fig:dist}A).
-In particular, we consider a set of units $\{ V_i(s) \}$, each with a target expectile $\tau_i := \frac{\alpha_i^+}{\alpha_i^+ + \alpha_i^-}$ of the return distribution $p_\pi(Z(s))$ (where $Z(s) = \mathbb{E}_{a \sim \pi(a|s)} Z(a, s)$).
+In particular, we consider a set of units $\{ V_i(s) \}$, each with a target expectile $\tau_i := \frac{\alpha_i^+}{\alpha_i^+ + \alpha_i^-}$ of the return distribution $p_\pi(Z(s))$ (where $Z(s) = \mathbb{E}_{a \sim \pi(a|s)} \left [ Z(a, s) \right ] $).
 These expectiles can be learned by sampling experience from the environment under the policy and defining a TD error for each unit and state transition as
 \begin{align}
-    \delta_i := r_t + \gamma V_j(s_{t+1}) - V_i(s_t).
+    \delta_i := r_t + \gamma \tilde{Z}_j(s_{t+1}) - V_i(s_t).
 \end{align}
-Here, $V_j(s_{t+1})$ is a \emph{random sample} from  $p_\pi(Z(s_{t+1}))$ \citep{lowet2020distributional,dabney2020distributional}.
+Here, $\tilde{Z}_j(s_{t+1})$ is a \emph{random sample} from the learned approximate distribution of cumulative future returns from state $s_{t+1}$, $p_{\{ V_i \} }(\tilde{Z}(s_{t+1}))$ \citep{lowet2020distributional,dabney2020distributional}.
 We then apply the following update rule to all units:
 \begin{equation}
     \label{eq:DRL_V_expec}
@@ -43,8 +43,9 @@ We then apply the following update rule to all units:
 \end{equation}
 In other words, we apply the TD update rule to each unit with learning rate $\alpha_i^+$ for positive TD errors and learning rate $\alpha_i^-$ for negative TD errors.
 When running this algorithm to convergence, $V_i(s)$ will approach the $\tau_i\textsuperscript{th}$ expectile ($\epsilon_{\tau_i}$) of $p_\pi(Z(s))$.
+In the deep RL setting, we would additionally use the chain rule to multiply $\Delta V_i(s_t)$ from \Cref{eq:DRL_V_expec} by $\partial V_i(s_t) / \partial \theta$ and sum over $i$ to learn a model with parameters $\theta$ that can predict the full set of expectiles.
 Another variant of this algorithm updates each unit with $\alpha_i \text{sign}(\delta_i)$ instead of $\alpha_i (\delta_i)$, which leads to learning of the $\tau_i\textsuperscript{th}$ \emph{quartiles} of the distribution instead of the expectiles.
-We refer to \citet{bellemare2017distributional,dabney2018distributional,rowland2019statistics,bellemare2023distributional}; and \citet{dabney2020distributional} for additional mathematical details and extensions to the control and deep RL settings.
+We refer to \citet{bellemare2017distributional,dabney2018distributional,rowland2019statistics,bellemare2023distributional}; and \citet{dabney2020distributional} for additional mathematical details and extensions to the control setting.
 
 \input{./figs_tex/_dist.tex}
 
@@ -62,4 +63,5 @@ More concretely, they showed that:
     \item When `imputing' the distribution (approximated as a set of delta functions) implied by the VTA neurons when interpreted as expectiles (\Cref{fig:dist}C), the resulting fit was remarkably similar to the true distribution of rewards in the experiment.
 \end{itemize}
 These findings generalize the canonical RPE view of \citet{schultz1997neural}, which can be seen as the averaged version of the theory put forward by \citet{dabney2020distributional}.
-While the expectile regression algorithm investigated by \citet{dabney2020distributional} relies on non-linear `imputation' of the implied return distribution and non-local TD updates, recent work has suggested more biologically plausible distributional RL updates that are also consistent with the biological data \citep{tano2020local}.
+The expectile regression algorithm investigated by \citet{dabney2020distributional} relies on non-local TD updates and non-linear `imputation' of the return distribution $p_{\{ V_i \} }(\tilde{Z}(s))$ induced by the learned expectiles $\{ V_i(s) \}$. 
+However, recent work has suggested more biologically plausible distributional RL updates that are also consistent with the biological data \citep{tano2020local}.

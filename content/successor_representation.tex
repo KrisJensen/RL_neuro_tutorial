@@ -34,8 +34,9 @@ Additionally, it has the appealing feature that the successor matrix can be lear
     \Delta M_{s_t s'} \propto -M_{s_t s'} + \delta(s_t, s') + \gamma M_{s_{t+1} s'}.
 \end{equation}
 Here, ${s'}$ is the set of all other states, $s_{t+1}$ is the next state actually observed, and the learning rule says that transitioning from $s_t$ to $s_{t+1}$ means that (i) we have just been in state $s_t$, and (ii) we should increase the expected occupancy of all states commonly reached from $s_{t+1}$ (including $s_{t+1}$ itself).
+Alternatively, if the transition matrix $\b{T}$ is known, where $T_{s s'} = p_{\pi}(s_{t+1} = s' | s_t = s)$, the successor matrix can be computed as the geometric series $\b{M} = \b{I} + \gamma \b{T} + \gamma^2 \b{T}^2 + \ldots = (\b{I} - \gamma \b{T})^{-1}$.
 
-The SR has also been proposed as a model of how humans and other animals learn and generalize \citep{momennejad2017successor, stachenfeld2017hippocampus, geerts2020general}.
+The SR has also been proposed as a model of how humans and other animals learn and generalize \citep{momennejad2017successor, stachenfeld2017hippocampus, geerts2020general,gershman2018successor}.
 For example, humans have been shown to be able to adapt more readily to changes in the reward function than changes in the transition function in a simple sequential binary decision-making task \citep{momennejad2017successor}, consistent with the SR facilitating rapid adaptation to changes in $\b{r}$ but only slow learning of $\b{M}$.
 Additionally, hippocampal `place cells' have been proposed to encode a predictive map, with each cell corresponding to a column of $\b{M}$ \citep{stachenfeld2017hippocampus}.
 In this model, the firing of a place cell in a given location $s$ reflects the expected future occupancy of its `preferred' location $s'$ conditioned on currently being at $s$.

@@ -8,7 +8,7 @@
         {\bfseries (A)}~Value functions aquired through temporal difference learning (\Cref{eq:TD-learning}) while acting according to either a random (top) or an optimal (bottom) policy.
         These simulations were performed with a random start state in the cliffworld environment to ensure full coverage of the space.
         Dark blue indicates negative expected reward (-100) and yellow indicates positive expected reward (+50).
-        For these simulations, we used a learning rate of $\delta = 0.05$ and no temporal discount factor ($\gamma = 1$).
+        For these simulations, we used a learning rate of $\delta = 0.05$ and no temporal discounting ($\gamma = 1$).
         Under the random policy, states near the cliff have low value even though they are close to the goal, since the agent will often fall off the cliff from there.
         Under the optimal policy, all states have high expected reward, since the agent will always find the goal.
         States nearer the goal have higher value than those further away, although this is hard to distinguish on this color scale.
