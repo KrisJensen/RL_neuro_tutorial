@@ -14,7 +14,7 @@
         The TD units show a constant linear scaling across positive and negative rewards, while the distributional units show an asymmetric scaling of firing rate with reward magnitude above and below their reversal point (black horizontal line).
         The ratio of slopes above and below the reversal point scales positively with the value of the reversal point.
         These features of dopaminergic VTA neurons were used by \citet{dabney2020distributional} to argue that the brain implements a form of distributional RL.
-        {\bfseries (C)}~True reward distribution (black) reproduced from (A), now plotted together with the reward distribution implied by the distributional units from (A) and (B) at different stages of learning (light to dark green).
+        {\bfseries (C)}~True reward distribution (black) reproduced from (A), now plotted together with the reward distribution $p_{\{ V_i \} }(\tilde{Z})$ implied by the distributional units from (A) and (B) at different stages of learning (light to dark green).
         These imputed distributions were computed by \emph{assuming} that the value $V_i$ learned by unit $i$ corresponds to expectile $\tau_i = \frac{\alpha_i^+}{\alpha_i^+ + \alpha_i^-}$ of the reward distribution.
         We then impute the distribution implied by these expectiles under the assumption that it consists of a set of $N$ delta functions in the case of $N$ expectiles \citep{rowland2019statistics}.
         Finally, we convolved the resulting delta functions with a Gaussian kernel ($\sigma = 0.1$) for visualization.

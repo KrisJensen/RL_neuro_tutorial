@@ -9,7 +9,7 @@
         For these simulations, we used a learning rate of $\delta = 0.05$ for all agents and no temporal discounting ($\gamma = 1$).
         The agent with $\epsilon = 0$ converges to an optimal policy, similar to the TD agent in \Cref{fig:TD}A.
         However, convergence is in this case slower despite using the same learning rate, because the Q-learner has to learn about each action independently, while the TD agent used its one-step world model to aggregate learning across actions reaching the same state.
-        In this cliffworld environment, increasing epsilon leads to worse performance since it increases the probability of falling of the cliff.
+        In this cliffworld environment, increasing epsilon leads to worse performance since it increases the probability of falling off the cliff.
         Additionally, there is no risk of getting stuck in a local minimum since there is only one rewarding state, which decreases the value of exploration.
         Lines and shading indicate mean and standard error across 10 simulations.
         {\bfseries (B)}~As in (A), now for a non-cliffworld grid environment with two goals: one with a reward of +20 at location (0, 4), and one with a reward of +50 at location (5,0).

@@ -7,17 +7,18 @@ However, recent work has suggested that performance could be improved by learnin
 \begin{equation}
     Z(s, a) \sim p \left ( \sum_{t' >= t} \gamma^{t' - t} r_{t'} | s_t = s, a_t = a \right )
 \end{equation}
-The stochasticity of $Z$ can both be due to stochasticity in environment dynamics and reward, or it could be due to stochasticity in the policy of the agent itself.
-Clearly, the expectation of samples from $Z$ equal the corresponding Q value:
+The stochasticity of $Z$ can both be due to stochasticity in environment dynamics and reward, and it can be due to stochasticity in the policy of the agent itself.
+Clearly, the expectation of samples of $Z$ equal the corresponding Q value:
 \begin{equation}
-    \mathbb{E} \left [ Z(s, a) \right ] = Q(s, a).
+    \mathbb{E}_{p(Z)} \left [ Z(s, a) \right ] = Q(s, a).
 \end{equation}
-However, instead of estimating this expectation, we now want to learn the full distribution of returns under our policy $\pi$, $p_\pi(Z(s, a))$.
-One use of learning this distribution is to develop methods which are risk averse \citep{morimura2010nonparametric,morimura2012parametric} or explicitly take into account uncertainty \citep{dearden1998bayesian}.
+Instead of only estimating this expectation, we now want to learn the full distribution of returns under our policy $\pi$, $p_\pi(Z(s, a))$.
+One use of learning this distribution is to develop methods that are risk averse \citep{morimura2010nonparametric,morimura2012parametric} or explicitly take into account uncertainty \citep{dearden1998bayesian}.
 However, recent work has suggested that such a distributional approach can also lead to improved performance in terms of expected rewards by improving representation learning in the deep RL setting \citep{bellemare2017distributional,dabney2018distributional,rowland2019statistics,bellemare2023distributional}.
+Some intuition for this can be had from noting that traditional deep RL approaches will only learn to distinguish states that have different expected value, while distributional RL will learn to distinguish any states that have different cumulative return distributions.
 
 To learn $p_\pi(Z(s, a))$, one option is to define a set of `atoms' that tile the (expected) support of the distribution and then discretize the distribution by assigning the full probability mass to these discrete locations.
-$p_\pi(Z(s, a))$ can then be iteratively improved using temporal differences by propagating each atom through the Bellman equation (\Cref{eq:Q-optimal}), projecting the density back onto the discretized locations, and training an RL agent to predict the corresponding probabilities.
+An approximate $p_\pi(Z(s, a))$ can then be iteratively improved using temporal differences by propagating each atom through the Bellman equation (\Cref{eq:Q-optimal}), projecting the density back onto the discretized locations, and training an RL agent to predict the corresponding probabilities.
 This is the approach originally employed by \citet{bellemare2017distributional}.
 However, it turns out to be more convenient from a neuroscientific perspective to represent a different set of sufficient statistics for $p_\pi(Z(s, a))$ \citep{dabney2020distributional,lowet2020distributional}.
 We do this by defining the $\tau\textsuperscript{th}$ \emph{expectile} of $p_\pi(Z(s, a))$, $\epsilon_\tau$, which is defined for a random variable $Z$ as the solution to the equation
@@ -54,7 +55,7 @@ In particular, \citet{dabney2020distributional} recorded the activity of dopamin
 More concretely, they showed that:
 \begin{itemize}
     \item The VTA neurons exhibited a range of different `reversal points' -- defined as the reward magnitude at which the firing rate of a neuron did not change from its baseline firing rate.
-    This is consistent with a distributional RL theory, where the change in neural firing rates from baseline correspond to the expectile TD updates considered above.
+    This is consistent with a distributional RL theory, where the changes in neural firing rates from baseline correspond to the expectile TD updates considered above.
     In this case, the reversal point of a neuron $i$ should be $V_i \approx \epsilon_{\tau_i}$ (\Cref{fig:dist}B).
     \item Neurons had different slopes describing the relationship between expected reward and firing rate in the regimes where expected reward was above and below the reversal point ($V_i$) of each neuron.
     This is consistent with the algorithm described in \Cref{eq:DRL_V_expec} (\Cref{fig:dist}B).

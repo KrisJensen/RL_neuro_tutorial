@@ -40,8 +40,8 @@ A wealth of other research also suggests a close correspondence between midbrain
 
 In \Cref{eq:TD-learning}, we simply learned a function for predicting reward without using this as the basis of taking good actions.
 Indeed, in classical Pavlovian conditioning, there are only states which happen in a predetermined order with no intervention or control on the part of the agent.
-However, having learned a value function, it is simple to use it for action selection provided we can estimate $p(s_{t+1} | s_t, a_t)$.
-In this case, we can write the expected reward associated with action $a$ as
+However, having learned a value function, it is simple to use it for action selection if we can estimate $p(s_{t+1} | s_t, a_t)$.
+In this case, the expected reward associated with action $a$ can be written as
 \begin{equation}
     \mathbb{E} \left [\sum_{t' = t} \gamma^{t'-t} r_{t'} | a_t = a \right ] = r(a_t, s_t) + \gamma \sum_{s_{t+1}} p(s_{t+1} | s_t, a_t) V(s_{t+1}).
 \end{equation}

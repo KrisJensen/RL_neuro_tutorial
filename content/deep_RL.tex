@@ -87,8 +87,8 @@ We therefore use $r_t + \gamma V(s_{t+1})$ to define the `advantage function' $A
 \begin{equation}
     \nabla_\theta J(\theta) \approx \frac{1}{N} \sum_{\tau \sim \pi_\theta}  \sum_{t=0}^T (r_t + \gamma V(s_{t+1}) - V(s_t)) \nabla_\theta \log \pi_\theta (a_t|s_t).
 \end{equation}
-While we have considered two extreme cases of a full Monte-Carlo estimate of $R_t$ and a `one-step' bootstrap, the sum in $R_t$ can be truncated to any order with $R_{t'}$ replaced by $V(s_{t'})$.
-In theory, this estimator remains unbiased if our value function is unbiased.
+While we have considered two extreme cases of a full Monte Carlo estimate of $R_t$ and a `one-step' bootstrap, the sum in $R_t$ can be truncated to any order with $R_{t'}$ replaced by $V(s_{t'})$.
+In theory, this estimator remains unbiased if our value function is correct.
 However, in practice the estimate of $V(s_{t'})$ learned by our critic will be inexact, which introduces a bias to our parameter updates.
 The bootstrapping procedure outlined above thus leads to a tradeoff between the bias and variance of our parameter updates, and the optimal tradeoff will depend on the problem setting, network architecture, and training paradigm being used.
 
@@ -99,7 +99,7 @@ In order to use out-of-the-box automatic differentiation software, we do this by
     \label{eq:Jtilde}
     \tilde{J}(\theta) = \frac{1}{N} \sum_{\tau \sim \pi_\theta}  \sum_{t=0}^T (R_t - V(s_t)) \log \pi_\theta (a_t|s_t),
 \end{equation}
-where $R_t$ and $V(s_t)$ are considered constant w.r.t. $\theta$.
+where $R_t$ and $V(s_t)$ are treated as constant w.r.t. $\theta$.
 In \Cref{eq:Jtilde} and the following equations, we can use either the empirical reward-to-go $R_t = \sum_{t' \geq t} \gamma^{t'-t} r_{t'}$, or we can use the bootstrapped estimate $R_t \approx r_t + \gamma V(s_{t+1})$.
 While $\tilde{J}(\theta)$ has no intrinsic interpretation, it is chosen such that
 \begin{equation}
@@ -121,7 +121,7 @@ Finally, it is also common to add an auxiliary entropy loss of the form $\mathca
 \input{./figs_tex/_metaRL.tex}
 
 While these policy gradient methods may seem far removed from neuroscience, they have had several applications in the field in recent years.
-For example, \citet{li2022integrating} recently demonstrated that an off-policy variant known as the `soft actor-critic' algorithm \citep{haarnoja2018soft} could be used to train an agent that shapes the behavior of \textit{C. elegans} via an optogenetic action space.
+For example, \citet{li2022integrating} recently demonstrated that an off-policy variant known as the `soft actor-critic' algorithm \citep{haarnoja2018soft} can be used to train an agent that shapes the behaviour of \textit{C. elegans} via an optogenetic action space.
 Networks trained with policy gradient algorithms have also recently attracted significant interest as models of learning and neural dynamics in the biological brain \citep{wang2018prefrontal, jensen2023recurrent, merel2019deep}.
 Of particular interest, \citet{wang2018prefrontal} suggested that frontal cortex can be well described as a \emph{recurrent} deep RL agent, where the RNN parameters are configured by learning from rewards over long periods of time from many tasks that have a shared underlying structure.
 Importantly, this `slow' model-free learning process gives rise to an agent that can rapidly learn from experience with \emph{fixed parameters} when exposed to a new task from the same distribution.

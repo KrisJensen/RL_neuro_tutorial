@@ -29,9 +29,9 @@ If the environment is determinstic, $p(s_{t+1} | s_t, a_t)$ is a delta function,
 Unfortunately, the optimization over all possible action sequences in \Cref{eq:Q-search} is in general an exponentially large search problem in the planning depth, which makes it infeasible for any reasonably sized problem setting.
 It is therefore common to either use `depth-first search' with limited breadth, or `breadth-first search' with limited depth.
 In breadth-first search, we consider all possible actions at each level of the search tree but terminate the search at a finite depth, instead using cached `model-free' state-values to estimate the reward-to-go from the termination of the search.
-This kind of `plan-until-habit' algorithm has also been proposed as a model of human behavior \citep{keramati2016adaptive}.
+This kind of `plan-until-habit' algorithm has also been proposed as a model of human behaviour \citep{keramati2016adaptive}.
 In depth-first search, we instead sample a series of paths from $s_t$ all the way to termination (or some upper bound), using a heuristic to prioritize actions expected to be good, and then pick a path associated with high expected reward.
-This is what is implemented in most Monte-Carlo tree search (MCTS) methods, such as AlphaZero \citep{silver2018general}, which uses a hardcoded transition function, and MuZero \citep{schrittwieser2020mastering}, which uses a learned transition function.
+This is what is implemented in most Monte Carlo tree search (MCTS) methods, such as AlphaZero \citep{silver2018general}, which uses a hardcoded transition function, and MuZero \citep{schrittwieser2020mastering}, which uses a learned transition function.
 In both of these approaches, neural networks are used (i) to estimate the `reward-to-go' if the maximum search depth is reached before termination, and (ii) to select which actions to evaluate during the search process.
 Methods for learning such value functions and policies in neural networks are covered in more detail in \Cref{sec:deep_RL}.
 
@@ -43,7 +43,7 @@ While this can be done very quickly on a computer, it seems unrealistic as a mod
 In some settings, it is possible to use more efficient algorithms once a model has been learned, such as Djikstra's algorithm or $A^*$-search in shortest-path problems \citep{hart1968formal}.
 However, it is in general necessary to somehow trade off the temporal opportunity cost of planning with the improvement in policy and expected reward \citep{botvinick2014computational,agrawal2022temporal}.
 This has been a popular research area in cognitive science, where a wealth of literature on `resource-rational' decision making has emerged in recent years \citep{griffiths2019doing,callaway2022rational}.
-However, this literature has often considered optimal behavior in simple tasks with less focus on the learning process and neural mechanisms that might implement the necessary computations.
+However, this literature has often considered optimal behaviour in simple tasks with less focus on the learning process and neural mechanisms that might implement the necessary computations.
 Bridging this gap, recent work has suggested that frontal cortex might initially store a `model-free' policy in its network state and gradually update this with model-based information from the hippocampal formation in cases where the policy improvement is expected to make up for the temporal opportunity cost \citep{jensen2023recurrent}.
 In this work, the authors found substantial policy improvements from only a few rollouts \citep{vul2014one}, and the `reaction times' of the agent exhibited similar task-related structure to human behaviour.
 
