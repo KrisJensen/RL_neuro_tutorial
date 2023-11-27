@@ -3,8 +3,8 @@
 
 While the policy gradient methods discussed above are useful, they also have limitations.
 One is that most policy gradient methods are fundamentally `on-policy', which means that the data used for learning must be sampled from the agent itself.
-This is necessary for the log derivative trick to work.
-Another is that the gradient can have fairly high variance despite all of our variance reduction efforts.
+This is necessary for the Monte Carlo estimate to be unbiased -- although `off-policy' policy gradient methods also exist, which de-bias the gradients e.g. through the use of importance sampling \citep{espeholt2018impala,jie2010connection,peshkin2002learning}.
+Another is that the policy gradients can have fairly high variance despite all of our variance reduction efforts.
 We can begin to tackle both of these shortcomings using a method known as `deep Q-learning'.
 To do so, we first note that our actor-critic algorithm above required us to estimate the value function $V_\phi(s_t)$.
 However, as we saw in \Cref{eq:value_action_selection}, such value functions can directly be used for action selection without having to fit a separate policy network.
