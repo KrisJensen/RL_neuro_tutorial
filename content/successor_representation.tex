@@ -2,10 +2,12 @@
 \label{sec:SR}
 
 As we saw in the previous section, an important distinction can be made between model-free reinforcement learning methods, which cache stimulus-response mappings based on prior experience, and model-based reinforcement learning methods, which compute a policy by simulating possible futures using a world model at decision-time.
-However, \citet{dayan1993improving} introduced a new formulation of the reinforcement learning reward function known as the `successor representation' (SR), which combines some of the features of model-free and model-based reinforcement learning.
+However, we have also noted how animals both need the flexibility of model-based methods as well as the rapid decision making afforded by model-free methods.
+It has therefore been suggested in a range of works that animals use either both or an intermediate method that combines some model-free and some model-based features.
+A particularly prevalent theory has been that of the `successor representation' (SR), which has been proposed to explain both human behaviour \citep{momennejad2017successor} and features of neural activity \citep{stachenfeld2017hippocampus}.
 In particular, the SR allows for flexible adaptation to changing reward functions without having to perform expensive simulations at decision time.
 
-This formulation rewrites the expected reward starting from state $s$ as
+\citet{dayan1993improving} introduced the theory underlying the SR, which rewrites the expected reward starting from state $s$ as
 \begin{align}
     V_\pi(s) &= \mathbb{E}_\pi \left [ \sum_{t = 0} \gamma^t r_t | s_0 = s\right ] \\
     &= \sum_{t = 0} \gamma^t \sum_{s'} p_\pi(s_t = s' | s_0 = s) r(s')\\
@@ -29,7 +31,9 @@ We can now compute the expected reward associated with each state under the new 
     \b{v}_\pi' = \b{M}^\pi \b{r}'.
 \end{equation}
 Of course this new value function will lead to us eventually changing our policy and having to update $\b{M}$, but it provides a better starting point than using the wrong policy \emph{and} value function as in standard temporal-difference learning (\Cref{fig:MB}C).
-Additionally, it has the appealing feature that the successor matrix can be learned by simple temporal-difference learning when transitioning from $s_t$, analogous to \Cref{eq:TD-learning}:
+This idea has found biological support in experiments showing that humans are more sensitive to changes in transition functions than changes in reward functions \citep{momennejad2017successor}.
+
+The successor matrix can be learned by simple temporal-difference learning when transitioning from $s_t$, analogous to \Cref{eq:TD-learning}:
 \begin{equation}
     \Delta M^\pi_{s_t s'} \propto -M^\pi_{s_t s'} + I_{s_t = s'} + \gamma M^\pi_{s_{t+1} s'}.
 \end{equation}
