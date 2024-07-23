@@ -4,34 +4,34 @@
 In classical temporal difference learning, we want to learn a \emph{value function} for a given state $s$ and policy $\pi$, which specifies the expected future reward when following $\pi$ starting from $s$:
 \begin{equation}
     \label{eq:V-values}
-    V_{\pi}(s) = \mathbb{E}_{a \sim \pi} \left [ \sum_{t' \geq t} \gamma^{t' - t} r_{t'} | s_t = s \right ].
+    V_{\pi}(s) = \mathbb{E}_{\tau \sim p_\pi(\tau)} \left [ \sum_{t' \geq t} \gamma^{t' - t} r_{t'} | s_t = s \right ].
 \end{equation}
-Here, $\mathbb{E}_{a \sim \pi} [ \cdot ]$ indicates an expectation taken over trajectories $\tau$ resulting from the agent following the policy $\pi$.
+Here, $\mathbb{E}_{\tau \sim p_\pi(\tau)} [ \cdot ]$ indicates an expectation taken over trajectories $\tau$ resulting from the agent following the policy $\pi$.
 For the true value function, we can expand this as a self-consistency equation
 \begin{align}
-    V_{\pi}(s) &= r(s) + \sum_{s'} p_{\pi}(s_{t+1} = s' | s_t = s) \mathbb{E}_{a \sim \pi} \left [ \sum_{t' = t+1} \gamma^{t' - t} r_{t'} | s_{t+1} = s' \right ] \\
+    V_{\pi}(s) &= r(s) + \sum_{s'} p_{\pi}(s_{t+1} = s' | s_t = s) \mathbb{E}_{\tau \sim p_\pi(\tau)} \left [ \sum_{t' = t+1} \gamma^{t' - t} r_{t'} | s_{t+1} = s' \right ] \\
     &=  r(s) + \gamma \sum_{s'} p_{\pi}(s_{t+1} = s' | s_t = s) V_{\pi}(s'),
     \label{eq:value_expansion}
 \end{align}
 where $p_{\pi}(s_{t+1} = s' | s_t = s) = \sum_a \pi(a|s) p(s_{t+1} = s' | s_t = s, a_t = a)$ is the probability of transitioning from $s$ to $s'$ under $\pi$.
 Importantly, \Cref{eq:value_expansion} would not hold if $V_{\pi}(s)$ was not the true value function \citep{sutton2018reinforcement}.
 %
-When learning an approximate value function $V(s_t)$, we can therefore use this bootstrapped self-consistency relation as an objective function:
+When learning an approximate value function $V(s)$, we can therefore use this bootstrapped self-consistency relation as an objective function:
 \begin{equation}
-    \mathcal{L} \propto \left (  V(s_t) - (r(s_t) + \gamma \mathbb{E}_\pi V(s_{t+1})) \right )^2,
+    \mathcal{L} \propto \left (  V(s) - \left ( r(s) + \gamma \mathbb{E}_{p_\pi(s'|s)} \left [ V(s') \right ] \right ) \right )^2,
 \end{equation}
-Gradient descent w.r.t $V(s_t)$ gives us an update rule
+Gradient descent w.r.t $V(s)$ gives us an update rule
 \begin{align}
-    \Delta V(s_t) &\propto - \frac{\partial \mathcal{L}}{\partial V(s_t)}\\
+    \Delta V(s) &\propto - \frac{\partial \mathcal{L}}{\partial V(s)}\\
     \label{eq:TD-learning_exp}
-    &\propto - V(s_t) + r(s_t) + \gamma \mathbb{E}_\pi \left [ V(s_{t+1}) \right ]\\
+    &\propto - V(s) + r(s) + \gamma \mathbb{E}_{p_\pi(s'|s)} \left [ V(s') \right ]\\
     \label{eq:TD-learning}
     &\approx - V(s_t) + r_t + \gamma V(s_{t+1}).
 \end{align}
-The last line approximates the expectation over next states with a single sample corresponding to the state and reward actually experienced.
+The last line approximates the expected update with a single sample corresponding to the states and reward actually experienced.
 As more and more experience is collected and many small gradient steps are taken according \Cref{eq:TD-learning}, these single-sample estimates will average out to the expectation in \Cref{eq:TD-learning_exp} (\Cref{fig:TD}A).
 Variants of this algorithm can also learn about multiple past states at once using the notion of \emph{eligibility traces} \citep{sutton2018reinforcement}.
-However, \Cref{eq:TD-learning} is the canonical temporal difference learning rule, and it leads to learning dynamics where the temporal difference error $\delta := - V(s_t) + r(s_t) + \gamma \mathbb{E}_\pi \left [ V(s_{t+1}) \right ]$ is progressively propagated from the rewarding state to prior states that predict the upcoming reward.
+However, \Cref{eq:TD-learning} is the canonical temporal difference learning rule, and it leads to learning dynamics where the temporal difference error $\delta := - V(s_t) + r(s_t) + \gamma \mathbb{E}_{p_\pi(s_{t+1})} \left [ V(s_{t+1}) \right ]$ is progressively propagated from the rewarding state to prior states that predict the upcoming reward.
 This forms the basis of the `temporal difference' signal proposed to be represented in dopaminergic VTA neurons \citep{schultz1997neural}.
 At the behavioural level, such theories of dopamine as a reinforcing signal are consistent with experiments showing that stimulation of dopamine neurons can be a strong driver of learning in instrumental conditioning tasks, where animals have to take explicit actions to achieve rewarding outcomes \citep{olds1954positive, tsai2009phasic}.
 A wealth of other research also suggests a close correspondence between midbrain dopaminergic neural activity and temporal difference learning, and we refer to \citet{niv2009reinforcement} and others for a more comprehensive overview.
@@ -40,15 +40,15 @@ A wealth of other research also suggests a close correspondence between midbrain
 
 In \Cref{eq:TD-learning}, we simply learned a function for predicting reward without using this as the basis of taking good actions.
 Indeed, in classical Pavlovian conditioning, there are only states which happen in a predetermined order with no intervention or control on the part of the agent.
-However, having learned a value function, it is simple to use it for action selection if we can estimate $p(s_{t+1} | s_t, a_t)$.
+However, having learned a value function, it is simple to use it for action selection if we can estimate $p(s' | s, a)$.
 In this case, the expected reward associated with action $a$ can be written as
 \begin{equation}
-    \mathbb{E} \left [\sum_{t' = t} \gamma^{t'-t} r_{t'} | a_t = a \right ] = r(a_t, s_t) + \gamma \sum_{s_{t+1}} p(s_{t+1} | s_t, a_t) V(s_{t+1}).
+    \mathbb{E} \left [\sum_{t' = t} \gamma^{t'-t} r_{t'} | s_t = s, a_t = a \right ] = r(s, a) + \gamma \sum_{s'} p( s' | s, a) V(s').
 \end{equation}
 We can then perform action selection by choosing the action with the highest expected reward,
 \begin{equation}
     \label{eq:value_action_selection}
-    a^*(s) = \text{argmax}_{a} \left ( r(s, a) + \gamma \sum_{s_{t+1}} p(s_{t+1} | s_t, a_t) V(s_{t+1}) \right ).
+    a^*(s) = \text{argmax}_{a} \left ( r(s, a) + \gamma \sum_{s'} p(s' | s, a) V(s') \right ).
 \end{equation}
 Updating the value function according to \Cref{{eq:TD-learning}} while acting in the environment according to \Cref{{eq:value_action_selection}} leads to an agent that gradually learns to take better actions as it learns a better value function (\Cref{fig:TD}B-C).
 

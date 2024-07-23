@@ -2,13 +2,13 @@
 
 In the previous section, we developed a so-called `model-free' reinforcement learning algorithm.
 This involves learning a stimulus-response pattern that says `when in state $s$, take action $a$'.
-Such algorithms do not require much computation at decision time, where there is no need to plan far into the future.
-However, it can require a lot of experience with the environment to learn these model-free policies, and they can be very inflexible in changing environments.
+Such algorithms do not require much computation at decision time, where they rely on cached state or action values.
+However, it can require a lot of experience with the environment to learn these model-free policies, and they can be inflexible in changing environments.
 
 On the other hand, `model-based' reinforcement learning uses a model of the world to simulate the consequences of different actions at decision time.
 This can be much more data efficient, since learning a world model is often simpler than learning a full policy (\Cref{fig:MB}A).
 However, model-based decision making can also be computationally intensive at decision-time in complicated state spaces (\Cref{fig:MB}B).
-Such models have recently exhibited impressive performance across a range of RL settings with large state spaces, including atari, chess, shogi, and Go \citep{silver2018general, schrittwieser2020mastering, deisenroth2011pilco}.
+Such models have recently exhibited impressive performance across a range of RL settings with large state spaces, including Atari, chess, shogi, and Go \citep{silver2018general, schrittwieser2020mastering, deisenroth2011pilco}.
 
 In model-based RL, experience is used to learn a transition-and-reward function $p(s_{t+1}, r_t | s_t, a_t)$ from past experience.
 Once this model has been learned, it can be used for planning at decision time.
@@ -18,10 +18,10 @@ This can be done for example by expanding the Q-value relation from \Cref{eq:Q-o
     \label{eq:Q-search}
     Q(s_t,a_t) &=  r_t + \gamma \mathbb{E}_{p(s_{t+1} | s_t, a_t)} \left [ \text{argmax}_{a_{t+1}} Q(s_{t+1}, a_{t+1}) \right ]\\
     &= r_t + \gamma \mathbb{E}_{p(s_{t+1} | s_t, a_t)} \left [ \text{argmax}_{a_{t+1}}
-    \left [ r(a_{t+1}, s_{t+1}) + \gamma \mathbb{E}_{p(s_{t+2} | s_{t+1}, a_{t+1})} \left [ \text{argmax}_{a_{t+2}} Q(s_{t+2}, a_{t+2}) \right ] \right ] \right ] \\
+    \left [ r(s_{t+1}, a_{t+1}) + \gamma \mathbb{E}_{p(s_{t+2} | s_{t+1}, a_{t+1})} \left [ \text{argmax}_{a_{t+2}} Q(s_{t+2}, a_{t+2}) \right ] \right ] \right ] \\
     %&= r_t + \sum_{s_{t+1}} p(s_{t+1} | s_t, a_t) \text{argmax}_{a_{t+1}}
-    %\left [ r(a_{t+1}, s_{t+1}) + \sum_{s_{t+2}} p(s_{t+2} | s_{t+1}, a_{t+1}) \text{argmax}_{a_{t+2}}
-    %\left [ r(a_{t+2}, s_{t+2}) + \sum_{s_{t+3}} p(s_{t+3} | s_{t+2}, a_{t+2}) \text{argmax}_{a_{t+3}} Q(s_{t+3}, a_{t+3}) \right ] \right ]
+    %\left [ r(s_{t+1}, a_{t+1}) + \sum_{s_{t+2}} p(s_{t+2} | s_{t+1}, a_{t+1}) \text{argmax}_{a_{t+2}}
+    %\left [ r(s_{t+2}, a_{t+2}) + \sum_{s_{t+3}} p(s_{t+3} | s_{t+2}, a_{t+2}) \text{argmax}_{a_{t+3}} Q(s_{t+3}, a_{t+3}) \right ] \right ]
     &= \ldots
 \end{align}
 }

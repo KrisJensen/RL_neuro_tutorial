@@ -7,7 +7,7 @@ An alternative approach for learning to select good actions (the so-called `cont
 This gives rise to `Q-learning' methods, where we learn the \emph{state-action values}
 \begin{equation}
     \label{eq:Q-values}
-    Q_\pi(s,a) =  \mathbb{E}_{a \sim \pi} \left [ \sum_{t'=t} \gamma^{t' - t} r_{t'} | s_{t} = s, a_{t} = a \right ].
+    Q_\pi(s,a) =  \mathbb{E}_{\tau \sim p_\pi(\tau)} \left [ \sum_{t'=t} \gamma^{t' - t} r_{t'} | s_{t} = s, a_{t} = a \right ].
 \end{equation}
 Given these state-action values, it is simple to perform action selection by taking the action with the highest expected reward in a given state,
 \begin{equation}
@@ -18,7 +18,7 @@ To learn the $Q$-values necessary for such action selection, we start by expandi
     \label{eq:Q-expanded}
     Q_\pi(s_t,a_t) =  r(s_t, a_t) + \gamma \sum_{s_{t+1}} p(s_{t+1} | s_t, a_t) \sum_{a_{t+1}} \pi(a_{t+1} | s_{t+1}) Q_\pi(s_{t+1}, a_{t+1}).
 \end{equation}
-For the greedy policy $\pi^g(a|s) := \delta(a, a^*(s))$, this gives rise to a self-consistency expression for the state-action values:
+For the greedy policy $\pi^g(a|s) := I_{a = a^*(s)}$, this gives rise to a self-consistency expression for the state-action values:
 \begin{equation}
     \label{eq:Q-optimal}
     Q_{\pi^g}(s_t,a_t) =  r(s_t, a_t) + \gamma \mathbb{E}_{s_{t+1} \sim p(s_{t+1} | s_t, a_t)} \left [ \text{max}_{a_{t+1}} Q_{\pi^g}(s_{t+1}, a_{t+1}) \right ].
@@ -38,7 +38,7 @@ This is the so-called Q-learning update rule (\citealp{watkins1989learning}; \Cr
 
 Q-learning is guaranteed to converge to the optimal policy in the limit of infinitesimal learning rates and infinite sampling of the state-action space \citep{watkins1992q,sutton2018reinforcement}.
 However, following the greedy policy $a^*(s) = \text{argmax}_{a} Q(s, a)$ before convergence of the Q values can lead to undersampling of the state-action space and poor performance.
-It is therefore common to either use an `$\epsilon$-greedy' policy, $\pi(a|s) = \epsilon / |\mathcal{A}| + (1-\epsilon) \delta(a, a^*(s))$, or a softmax-policy, $\pi(a|s) \propto \text{exp}(\beta Q(a, s))$, to collect the experience used to update the Q values (\Cref{fig:Q}B).
+It is therefore common to either use an `$\epsilon$-greedy' policy, $\pi(a|s) = \epsilon / |\mathcal{A}| + (1-\epsilon) I_{a = a^*(s)}$, or a softmax-policy, $\pi(a|s) \propto \text{exp}(\beta Q(s, a))$, to collect the experience used to update the Q values (\Cref{fig:Q}B).
 These approaches give rise to so-called `off-policy' algorithms, since the policy used in the learning update (the greedy policy) is different from the policy used for action selection (the stochastic policy).
 An on-policy version of Q-learning known as `SARSA' (state-action-reward-state-action) is also commonly used, where the Q-learning update uses the Q-value corresponding to the action $a_{t+1}$ sampled at the next timestep instead of the greedy action (\Cref{fig:Q}C):
 \begin{align}

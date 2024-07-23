@@ -6,7 +6,7 @@
         %
         {\bfseries Q-learning.}
         {\bfseries (A)}~Empirical reward as a function of episode number for Q-learners with different levels of stochasticity in their policy ($\epsilon \in \{0, 0.1, 0.2\}$; legend).
-        For these simulations, we used a learning rate of $\delta = 0.05$ for all agents and no temporal discounting ($\gamma = 1$).
+        For these simulations, we used a learning rate of $\alpha = 0.05$ for all agents and no temporal discounting ($\gamma = 1$).
         The agent with $\epsilon = 0$ converges to an optimal policy, similar to the TD agent in \Cref{fig:TD}A.
         However, convergence is in this case slower despite using the same learning rate, because the Q-learner has to learn about each action independently, while the TD agent used its one-step world model to aggregate learning across actions reaching the same state.
         In this cliffworld environment, increasing epsilon leads to worse performance since it increases the probability of falling off the cliff.
@@ -14,7 +14,7 @@
         Lines and shading indicate mean and standard error across 10 simulations.
         {\bfseries (B)}~As in (A), now for a non-cliffworld grid environment with two goals: one with a reward of +20 at location (0, 4), and one with a reward of +50 at location (5,0).
         In this case, having non-zero epsilon can increase the probability of discovering the `high reward' goal rather than getting stuck with a locally optimal policy of moving to the `low reward' goal.
-        In these simulations, we used a learning rate of $\delta = 1$, since this effect is less robust with lower learning rates that lead to more exploration of the environment across all agents.
+        In these simulations, we used a learning rate of $\alpha = 1$, since this effect is less robust with lower learning rates that lead to more exploration of the environment across all agents.
         {\bfseries (C)}~Policy learned by a Q-learning (top) or a SARSA (bottom) agent with $\epsilon = 0.2$.
         Colours indicate the maximum value of any action in a state from blue (-100) to yellow (+50), and arrows indicate which action has the highest value.
         The Q-learning agent learns to move right above the cliff, because this is the optimal thing to do under the assumption that subsequent actions are also optimal.

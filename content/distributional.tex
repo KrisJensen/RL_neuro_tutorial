@@ -17,7 +17,7 @@ One use of learning this distribution is to develop methods that are risk averse
 However, recent work has suggested that such a distributional approach can also lead to improved performance in terms of expected rewards by improving representation learning in the deep RL setting \citep{bellemare2017distributional,dabney2018distributional,rowland2019statistics,bellemare2023distributional}.
 Some intuition for this can be had from noting that traditional deep RL approaches will only learn to distinguish states that have different expected value, while distributional RL will learn to distinguish any states that have different cumulative return distributions.
 
-To learn $p_\pi(Z(s, a))$, one option is to define a set of `atoms' that tile the (expected) support of the distribution and then discretize the distribution by assigning the full probability mass to these discrete locations.
+To learn $p_\pi(Z(s, a))$, one option is to define a set of `atoms' that tile the (anticipated) support of the distribution and then discretize the distribution by assigning the full probability mass to these discrete locations.
 An approximate $p_\pi(Z(s, a))$ can then be iteratively improved using temporal differences by propagating each atom through the Bellman equation (\Cref{eq:Q-optimal}), projecting the density back onto the discretized locations, and training an RL agent to predict the corresponding probabilities.
 This is the approach originally employed by \citet{bellemare2017distributional}.
 However, it turns out to be more convenient from a neuroscientific perspective to represent a different set of sufficient statistics for $p_\pi(Z(s, a))$ \citep{dabney2020distributional,lowet2020distributional}.
@@ -31,7 +31,7 @@ Translating this to an RL algorithm involves training a network (or tabular valu
 The parameters of the agent are then updated by propagating the distribution implied by the predicted expectiles through the Bellman equation and minimizing the difference between the initial and propagated distributions.
 
 In the tabular value learning case (c.f. \Cref{sec:temporal_difference}), this turns out to be particularly simple do via the use of a modified TD-update rule (c.f. \Cref{eq:TD-learning}; \citealp{lowet2020distributional}; \Cref{fig:dist}A).
-In particular, we consider a set of units $\{ V_i(s) \}$, each with a target expectile $\tau_i := \frac{\alpha_i^+}{\alpha_i^+ + \alpha_i^-}$ of the return distribution $p_\pi(Z(s))$ (where $Z(s) = \mathbb{E}_{a \sim \pi(a|s)} \left [ Z(a, s) \right ] $).
+In particular, we consider a set of units $\{ V_i(s) \}$, each with a target expectile $\tau_i := \frac{\alpha_i^+}{\alpha_i^+ + \alpha_i^-}$ of the return distribution $p_\pi(Z(s))$ (where $p_\pi(Z(s)) = \sum_a \left [ \pi(a|s) p_\pi(Z(s,a)) \right ] $).
 These expectiles can be learned by sampling experience from the environment under the policy and defining a TD error for each unit and state transition as
 \begin{align}
     \delta_i := r_t + \gamma \tilde{Z}_j(s_{t+1}) - V_i(s_t).
@@ -45,7 +45,7 @@ We then apply the following update rule to all units:
 In other words, we apply the TD update rule to each unit with learning rate $\alpha_i^+$ for positive TD errors and learning rate $\alpha_i^-$ for negative TD errors.
 When running this algorithm to convergence, $V_i(s)$ will approach the $\tau_i\textsuperscript{th}$ expectile ($\epsilon_{\tau_i}$) of $p_\pi(Z(s))$.
 In the deep RL setting, we would additionally use the chain rule to multiply $\Delta V_i(s_t)$ from \Cref{eq:DRL_V_expec} by $\partial V_i(s_t) / \partial \theta$ and sum over $i$ to learn a model with parameters $\theta$ that can predict the full set of expectiles.
-Another variant of this algorithm updates each unit with $\alpha_i \text{sign}(\delta_i)$ instead of $\alpha_i (\delta_i)$, which leads to learning of the $\tau_i\textsuperscript{th}$ \emph{quartiles} of the distribution instead of the expectiles.
+Another variant of this algorithm updates each unit with $\alpha_i \text{sign}(\delta_i)$ instead of $\alpha_i (\delta_i)$, which leads to learning of the $\tau_i\textsuperscript{th}$ \emph{quantiles} of the distribution instead of the expectiles.
 We refer to \citet{bellemare2017distributional,dabney2018distributional,rowland2019statistics,bellemare2023distributional}; and \citet{dabney2020distributional} for additional mathematical details and extensions to the control setting.
 
 \input{./figs_tex/_dist.tex}

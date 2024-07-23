@@ -9,8 +9,8 @@ By making this assumption, we can generalize to unseen states based on our previ
 Recent years have seen incredible progress in this setting by using deep or recurrent neural networks as powerful function approximators for reinforcement learning -- the domain of `deep reinforcement learning'.
 This approach has seen an increase in interest not just in the machine learning literature, but recently also as a model of neural dynamics and behaviour in humans and other animals \citep{wang2018prefrontal, jensen2023recurrent, makino2023arithmetic, merel2019deep, banino2018vector}.
 For a more comprehensive overview of the links between deep RL and neuroscience, we refer the interested reader to \citet{botvinick2020deep}.
-Modern approaches in (model-free) deep RL can largely be divided into two categories: policy gradient methods and deep Q learning.
-In policy gradient methods, we directly train the network to output a policy, whereas deep Q networks (DQNs) output a set of state-action values that can be used for action selection.
+Modern approaches in (model-free) deep RL can largely be divided into two categories: policy gradient methods and value-based methods.
+In policy gradient methods, we directly train the network to output a policy, whereas value-based methods compute a set of state-action values that can be used for action selection.
 
 \input{./content/policy_grad.tex}
 
