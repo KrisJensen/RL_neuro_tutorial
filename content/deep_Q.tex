@@ -1,15 +1,8 @@
 
 \subsubsection*{Value-based methods}
 
-While the policy gradient methods discussed above are useful, they also have limitations.
-One is that most policy gradient methods are fundamentally `on-policy', which means that the data used for learning must be sampled from the agent itself.
-This is necessary for the Monte Carlo estimate to be unbiased -- although `off-policy' policy gradient methods also exist, which de-bias the gradients e.g. through the use of importance sampling \citep{espeholt2018impala,jie2010connection,peshkin2002learning}.
-Another is that the policy gradients can have fairly high variance despite all of our variance reduction efforts.
-We can begin to tackle both of these shortcomings using a method known as `deep Q-learning'.
-To do so, we first note that our actor-critic algorithm above required us to estimate the value function $V_\phi(s_t)$.
-However, as we saw in \Cref{eq:value_action_selection}, such value functions can directly be used for action selection without having to fit a separate policy network.
-We also noted previously that this requires simulating the results of the actions, which can be inconvenient.
-As in the tabular setting, we can circumvent this problem by directly fitting state-action values (`Q-values'), now using function approximation.
+The deep reinforcement learning methods most similar to the tabular methods considered in \Cref{sec:temporal_difference} and \Cref{sec:q_learning} use a neural network to compute state-action values, which can be used for action selection as we saw in \Cref{eq:value_action_selection}.
+However, by using function approximation instead of the tabular values considered previously, these networks can generalize to unseen states in large state spaces.
 This gives rise to the family of `deep Q-learning' methods, which closely mirror the tabular Q-learning considered previously, but now with function approximation.
 
 The general recipe involves defining a state action value function $Q_\theta(s, a)$, where the parameters $\theta$ of the deep network defining our agent are learned as follows:

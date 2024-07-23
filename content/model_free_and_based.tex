@@ -4,24 +4,22 @@ In the previous section, we developed a so-called `model-free' reinforcement lea
 This involves learning a stimulus-response pattern that says `when in state $s$, take action $a$'.
 Such algorithms do not require much computation at decision time, where they rely on cached state or action values.
 However, it can require a lot of experience with the environment to learn these model-free policies, and they can be inflexible in changing environments.
+This is incompatible with many aspect of animal behaviour, which we know is adaptive and can benefit from `latent learning' in an environment before a reward-driven task is encountered in the first place \citep{blodgett1929effect,tolman1948cognitive}.
 
 On the other hand, `model-based' reinforcement learning uses a model of the world to simulate the consequences of different actions at decision time.
 This can be much more data efficient, since learning a world model is often simpler than learning a full policy (\Cref{fig:MB}A).
-However, model-based decision making can also be computationally intensive at decision-time in complicated state spaces (\Cref{fig:MB}B).
-Such models have recently exhibited impressive performance across a range of RL settings with large state spaces, including Atari, chess, shogi, and Go \citep{silver2018general, schrittwieser2020mastering, deisenroth2011pilco}.
+First learning a model of the environment, and then using it to guide reward-driven behaviour also provides one plausible explanation for latent learning and other types of rapid adaptation.
+However, model-based decision making can be computationally intensive at decision-time, which is a challenge for animals that rely on rapid decision making for survival (\Cref{fig:MB}B).
 
-In model-based RL, experience is used to learn a transition-and-reward function $p(s_{t+1}, r_t | s_t, a_t)$ from past experience.
+In model-based RL, an approximate transition-and-reward function $\tilde{p}(s_{t+1}, r_t | s_t, a_t)$ is learned from past experience.
 Once this model has been learned, it can be used for planning at decision time.
 This can be done for example by expanding the Q-value relation from \Cref{eq:Q-optimal}:
 {\small
 \begin{align}
     \label{eq:Q-search}
-    Q(s_t,a_t) &=  r_t + \gamma \mathbb{E}_{p(s_{t+1} | s_t, a_t)} \left [ \text{argmax}_{a_{t+1}} Q(s_{t+1}, a_{t+1}) \right ]\\
-    &= r_t + \gamma \mathbb{E}_{p(s_{t+1} | s_t, a_t)} \left [ \text{argmax}_{a_{t+1}}
-    \left [ r(s_{t+1}, a_{t+1}) + \gamma \mathbb{E}_{p(s_{t+2} | s_{t+1}, a_{t+1})} \left [ \text{argmax}_{a_{t+2}} Q(s_{t+2}, a_{t+2}) \right ] \right ] \right ] \\
-    %&= r_t + \sum_{s_{t+1}} p(s_{t+1} | s_t, a_t) \text{argmax}_{a_{t+1}}
-    %\left [ r(s_{t+1}, a_{t+1}) + \sum_{s_{t+2}} p(s_{t+2} | s_{t+1}, a_{t+1}) \text{argmax}_{a_{t+2}}
-    %\left [ r(s_{t+2}, a_{t+2}) + \sum_{s_{t+3}} p(s_{t+3} | s_{t+2}, a_{t+2}) \text{argmax}_{a_{t+3}} Q(s_{t+3}, a_{t+3}) \right ] \right ]
+    Q(s_t,a_t) &\approx  r_t + \gamma \mathbb{E}_{\tilde{p}(s_{t+1} | s_t, a_t)} \left [ \text{argmax}_{a_{t+1}} Q(s_{t+1}, a_{t+1}) \right ]\\
+    &\approx r_t + \gamma \mathbb{E}_{\tilde{p}(s_{t+1} | s_t, a_t)} \left [ \text{argmax}_{a_{t+1}}
+    \left [ r(s_{t+1}, a_{t+1}) + \gamma \mathbb{E}_{\tilde{p}(s_{t+2} | s_{t+1}, a_{t+1})} \left [ \text{argmax}_{a_{t+2}} Q(s_{t+2}, a_{t+2}) \right ] \right ] \right ] \\
     &= \ldots
 \end{align}
 }
@@ -30,28 +28,23 @@ Unfortunately, the optimization over all possible action sequences in \Cref{eq:Q
 It is therefore common to either use `depth-first search' with limited breadth, or `breadth-first search' with limited depth.
 In breadth-first search, we consider all possible actions at each level of the search tree but terminate the search at a finite depth, instead using cached `model-free' state-values to estimate the reward-to-go from the termination of the search.
 This kind of `plan-until-habit' algorithm has also been proposed as a model of human behaviour \citep{keramati2016adaptive}.
-In depth-first search, we instead sample a series of paths from $s_t$ all the way to termination (or some upper bound), using a heuristic to prioritize actions expected to be good, and then pick a path associated with high expected reward.
-This is what is implemented in most Monte Carlo tree search (MCTS) methods, such as AlphaZero \citep{silver2018general}, which uses a hardcoded transition function, and MuZero \citep{schrittwieser2020mastering}, which uses a learned transition function.
-In both of these approaches, neural networks are used (i) to estimate the `reward-to-go' if the maximum search depth is reached before termination, and (ii) to select which actions to evaluate during the search process.
-Methods for learning such value functions and policies in neural networks are covered in more detail in \Cref{sec:deep_RL}.
+In depth-first search, we instead sample a series of paths from $s_t$ all the way to termination (or some upper bound), using a heuristic to prioritize actions expected to be good, and then pick a path associated with high expected reward \citep{huys2012bonsai}.
 
 \input{./figs_tex/_MB.tex}
 
-A shortcoming of these MCTS-based approaches from a neuroscientific perspective is that they often perform a large number of node expansions at each decision point.
-For example, MuZero and AlphaZero perform 800 rollouts to a leaf node for each decision that they make.
+A shortcoming of these approaches from a neuroscientific perspective is that they often perform a large number of node expansions at each decision point.
 While this can be done very quickly on a computer, it seems unrealistic as a model of human decision making.
 In some settings, it is possible to use more efficient algorithms once a model has been learned, such as Djikstra's algorithm or $A^*$-search in shortest-path problems \citep{hart1968formal}.
 However, it is in general necessary to somehow trade off the temporal opportunity cost of planning with the improvement in policy and expected reward \citep{botvinick2014computational,agrawal2022temporal}.
 This has been a popular research area in cognitive science, where a wealth of literature on `resource-rational' decision making has emerged in recent years \citep{griffiths2019doing,callaway2022rational}.
 However, this literature has often considered optimal behaviour in simple tasks with less focus on the learning process and neural mechanisms that might implement the necessary computations.
-Bridging this gap, recent work has suggested that frontal cortex might initially store a `model-free' policy in its network state and gradually update this with model-based information from the hippocampal formation in cases where the policy improvement is expected to make up for the temporal opportunity cost \citep{jensen2023recurrent}.
-In this work, the authors found substantial policy improvements from only a few rollouts \citep{vul2014one}, and the `reaction times' of the agent exhibited similar task-related structure to human behaviour.
+Bridging this gap, recent work has suggested that frontal cortex might initially store a `model-free' policy in its network state, which is gradually updated with model-based information from the hippocampal formation until the policy improvement is outweighed by the temporal opportunity cost of planning \citep{jensen2023recurrent}.
+%In this work, the authors found substantial policy improvements from only a few rollouts \citep{vul2014one}, and the `reaction times' of the agent exhibited similar task-related structure to human behaviour.
 
-While several model-based and model-free reinforcement learning methods have thus been developed and used to model animal learning and behaviour, it remains an open question when and whether different approaches are used.
+While several model-based and model-free reinforcement learning methods have thus been developed and used to model animal learning and behaviour, it remains an open question when and whether these different strategies drive animal behaviour.
 A different line of research has explicitly investigated the trade-offs between model-based and model-free RL in biological agents \citep{daw2005uncertainty, geerts2020general, lengyel2007hippocampal}, where the choice between the two approaches is thought to be guided by some notion of optimality on the basis of available resources and uncertainty about the environment.
 A popular paradigm for such studies attempting to distinguish between model-free and model-based behaviour is the so-called `two-step' task developed by Daw and colleagues (\citealp{daw2011model,momennejad2017successor,wang2018prefrontal}; although note \citealp{akam2015simple}).
 
 It has generally been accepted that humans can use both model-free and model-based decision making, with the dorsolateral striatum being particularly important for model-free reinforcement learning \citep{yin2004lesions, yin2005role}, and the dorsomedial striatum, prefrontal cortex, and hippocampal formation being important for model-based decision making \citep{vikbladh2019hippocampal,geerts2020general,miller2017dorsal,niv2009reinforcement,killcross2003coordination}.
-This has interesting parallels to recent work in the motor learning literature, where the basal ganglia were found to be sufficient for `habitual' motor sequences even in the absence of motor cortex, while motor cortex was necessary for more flexible motor behaviours that are likely to require a high-level `schema' of the task structure \citep{mizes2023motor,mizes2023dissociating}.
-
-
+This also has interesting parallels to recent work in the motor learning literature, where the basal ganglia were found to be sufficient for `habitual' motor sequences even in the absence of motor cortex, while motor cortex was necessary for more flexible motor behaviours that are likely to require a high-level `schema' of the task structure \citep{mizes2023motor,mizes2023dissociating}.
+In \Cref{sec:scalar_rew} we will see how combining these model-based and model-free ideas with deep learning can also lead to human-level performance in tasks such as chess and Go that require long-term planning, and how such algorithms can provide inspiration for future studies of neuroscience and behaviour.
