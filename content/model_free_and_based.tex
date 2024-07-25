@@ -1,4 +1,5 @@
 \section{Model-free and model-based reinforcement learning}
+\label{sec:model_free_based}
 
 In the previous section, we developed a so-called `model-free' reinforcement learning algorithm.
 This involves learning a stimulus-response pattern that says `when in state $s$, take action $a$'.
@@ -8,7 +9,8 @@ This is incompatible with many aspect of animal behaviour, which we know is adap
 
 On the other hand, `model-based' reinforcement learning uses a model of the world to simulate the consequences of different actions at decision time.
 This can be much more data efficient, since learning a world model is often simpler than learning a full policy (\Cref{fig:MB}A).
-First learning a model of the environment, and then using it to guide reward-driven behaviour also provides one plausible explanation for latent learning and other types of rapid adaptation.
+In machine learning settings, model-based RL has exhibited impressive performance across a range of tasks with large state spaces, including Atari, chess, shogi, and Go \citep{silver2018general, schrittwieser2020mastering, deisenroth2011pilco}
+In a biological context, the idea of first learning a model of the environment, and then using it to guide reward-driven behaviour also provides one plausible explanation for latent learning and other types of rapid adaptation.
 However, model-based decision making can be computationally intensive at decision-time, which is a challenge for animals that rely on rapid decision making for survival (\Cref{fig:MB}B).
 
 In model-based RL, an approximate transition-and-reward function $\tilde{p}(s_{t+1}, r_t | s_t, a_t)$ is learned from past experience.

@@ -31,8 +31,6 @@ We can now compute the expected reward associated with each state under the new 
     \b{v}_\pi' = \b{M}^\pi \b{r}'.
 \end{equation}
 Of course this new value function will lead to us eventually changing our policy and having to update $\b{M}$, but it provides a better starting point than using the wrong policy \emph{and} value function as in standard temporal-difference learning (\Cref{fig:MB}C).
-This idea has found biological support in experiments showing that humans are more sensitive to changes in transition functions than changes in reward functions \citep{momennejad2017successor}.
-
 The successor matrix can be learned by simple temporal-difference learning when transitioning from $s_t$, analogous to \Cref{eq:TD-learning}:
 \begin{equation}
     \Delta M^\pi_{s_t s'} \propto -M^\pi_{s_t s'} + I_{s_t = s'} + \gamma M^\pi_{s_{t+1} s'}.
@@ -41,10 +39,12 @@ Here, ${s'}$ is the set of all other states, $s_{t+1}$ is the next state actuall
 Alternatively, if the policy-dependent transition matrix $\b{T}^\pi$ is known, where $T^\pi_{s s'} = p_{\pi}(s_{t+1} = s' | s_t = s)$, the successor matrix can be computed as the geometric series $\b{M}^\pi = \b{I} + \gamma \b{T}^\pi + \gamma^2 (\b{T}^\pi)^2 + \ldots = (\b{I} - \gamma \b{T}^\pi)^{-1}$.
 
 The SR has also been proposed as a model of how humans and other animals learn and generalize \citep{momennejad2017successor, stachenfeld2017hippocampus, geerts2020general,gershman2018successor}.
-For example, humans have been shown to be able to adapt more readily to changes in the reward function than changes in the transition function in a simple sequential binary decision-making task \citep{momennejad2017successor}, consistent with the SR facilitating rapid adaptation to changes in $\b{r}$ but only slow learning of $\b{M}$.
+For example, humans have been shown to adapt more readily to changes in reward functions than changes in transition functions in a simple sequential binary decision-making task \citep{momennejad2017successor}, consistent with the SR facilitating rapid adaptation to changes in $\b{r}$ but only slow learning of $\b{M}$.
 Additionally, hippocampal `place cells' have been proposed to encode a predictive map, with each cell corresponding to a column of $\b{M}$ \citep{stachenfeld2017hippocampus}.
 In this model, the firing of a place cell in a given location $s$ reflects the expected future occupancy of its `preferred' location $s'$ conditioned on currently being at $s$.
-\citet{stachenfeld2017hippocampus} showed that the SR model explains a range of findings in the hippocampal literature, including asymmetric place fields on a one-dimensional track \citep{mehta2000experience} and local remapping of place fields near a barrier \citep{alvernhe2011local}.
+\citet{stachenfeld2017hippocampus} showed that the SR model explains a range of findings in the hippocampal literature.
+For example, this model explains the asymmetry of place fields on a one-dimensional track \citep{mehta2000experience}, where $s'$ will is more likely to be reached from other states $s$ that \emph{precede} $s'$ than equidistant states that \emph{follow} $s'$.
+The SR also explains why place fields change near a newly inserted barrier, since two states on either side of the barrier can no longer be visited in quick succession \citep{alvernhe2011local}.
 
 While the SR is perhaps the most prominent model in systems neuroscience that combines features of model-free and model-based RL, it is not the only one.
 Another interesting approach that has found parallels in the neuroscience literature is the `DYNA' architecture of \citet{sutton1991dyna}.
@@ -53,4 +53,4 @@ This allows for more data-efficient learning of model-free policies at the cost 
 The model used to simulate data for offline training can either be an explicit learned world model, or it can simply be a memory buffer of past experiences in the form of $(s_t, a_t, r_t, s_{t+1}, a_{t+1})$ tuples.
 Such experience replay has proven crucial to the success of modern deep reinforcement learning agents by allowing for higher data efficiency and reducing the instability arising from the autocorrelated nature of online experience \citep{mnih2013playing,schaul2015prioritized}.
 A prominent theory in neuroscience suggests that hippocampal replays could be implementing such a DYNA-like algorithm by generating imagined experience used to train the model-free RL systems of the brain \citep{mattar2018prioritized}.
-This theory is supported by the finding that the patterns of replay exhibited by rodents in various navigation tasks are consistent with the optimal replays of a Q-learning agent with DYNA.
+This theory is supported by the finding that the patterns of replay exhibited by rodents in various navigation tasks are consistent with the optimal replays of a Q-learning agent with DYNA, and it has recently been extended to explain not just the content of replay but also their timing \citep{agrawal2022temporal}.

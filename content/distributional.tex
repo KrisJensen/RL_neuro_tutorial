@@ -1,9 +1,11 @@
-\section*{Distributional reinforcement learning}
+\section{Distributional reinforcement learning}
 \label{sec:distributional}
 
-In \Cref{eq:V-values} and \Cref{eq:Q-values}, we defined the \emph{expected} reward for a given state or state-action pair.
+In \Cref{eq:V-values} and \Cref{eq:Q-values}, we defined the expected future reward for a given state or state-action pair.
 The methods considered so far have only used such expectations as a learning signal.
-However, recent work has suggested that performance could be improved by learning the full \emph{distribution} of cumulative future rewards for a given state-action pair \citep{bellemare2017distributional, bellemare2023distributional,dabney2018distributional}, a single sample of which we denote $Z$:
+However, recent research suggests that animals may in fact compute entire reward distributions \citep{dabney2020distributional, sousa2023dopamine}
+These studies were inspired by findings that such \emph{distribution RL} can improve the performance of artificial agents \citep{bellemare2017distributional, bellemare2023distributional,dabney2018distributional}.
+To formalize this, we use $Z$ to denote a single sample from the distribution over possible discounted future rewards:
 \begin{equation}
     Z(s, a) \sim p \left ( \sum_{t' >= t} \gamma^{t' - t} r_{t'} | s_t = s, a_t = a \right )
 \end{equation}
@@ -13,9 +15,9 @@ Clearly, the expectation of samples of $Z$ equal the corresponding Q value:
     \mathbb{E}_{p(Z)} \left [ Z(s, a) \right ] = Q(s, a).
 \end{equation}
 Instead of only estimating this expectation, we now want to learn the full distribution of returns under our policy $\pi$, $p_\pi(Z(s, a))$.
-One use of learning this distribution is to develop methods that are risk averse \citep{morimura2010nonparametric,morimura2012parametric} or explicitly take into account uncertainty \citep{dearden1998bayesian}.
+One normative reason to learn this distribution is to develop methods that are risk averse \citep{morimura2010nonparametric,morimura2012parametric} or explicitly take into account uncertainty \citep{dearden1998bayesian}.
 However, recent work has suggested that such a distributional approach can also lead to improved performance in terms of expected rewards by improving representation learning in the deep RL setting \citep{bellemare2017distributional,dabney2018distributional,rowland2019statistics,bellemare2023distributional}.
-Some intuition for this can be had from noting that traditional deep RL approaches will only learn to distinguish states that have different expected value, while distributional RL will learn to distinguish any states that have different cumulative return distributions.
+This is because traditional deep RL only learns to distinguish states that have different expected value, while distributional RL learns to distinguish any states that have different cumulative return distributions.
 
 To learn $p_\pi(Z(s, a))$, one option is to define a set of `atoms' that tile the (anticipated) support of the distribution and then discretize the distribution by assigning the full probability mass to these discrete locations.
 An approximate $p_\pi(Z(s, a))$ can then be iteratively improved using temporal differences by propagating each atom through the Bellman equation (\Cref{eq:Q-optimal}), projecting the density back onto the discretized locations, and training an RL agent to predict the corresponding probabilities.

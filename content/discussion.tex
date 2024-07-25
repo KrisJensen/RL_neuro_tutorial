@@ -9,7 +9,7 @@ While RL has thus already had a profound influence on systems neuroscience, seve
 In particular, much of the work in neuroscience has focused on simple stimulus-response or binary decision making tasks.
 This is a far reach from ethologically relevant problems that involve processing complex multimodal stimuli, decision making with long-lasting consequences, and complex high-dimensional motor control.
 Some recent work building on deep RL has started to bridge this gap.
-For example, \citet{banino2018vector} showed the emergence of grid cells in agents navigating complex environments, \citet{merel2019deep} showed similarities between an RL agent trained on a suite of complex motor tasks and rodent motor representations, and \citet{jensen2023recurrent} showed parallels between a recurrent meta-RL agent and human behaviour in a navigation task requiring temporally extended thinking.
+For example, \citet{banino2018vector} showed the emergence of grid cells in agents navigating complex environments, \citet{aldarondo2024virtual} showed similarities between an RL agent trained to control a virtual rodent and corresponding biological motor representations, and \citet{jensen2023recurrent} showed parallels between a recurrent meta-RL agent and human behaviour in a navigation task requiring temporally extended thinking.
 However, much work remains to be done to extend our neuroscientific findings to ethologically relevant settings, both on the experimental side and on the computational side.
 
 A related challenge will be to combine different components of existing models to capture the generalist nature of biological circuits.
@@ -23,6 +23,8 @@ This is in stark contrast to most human decision making, which occurs over exten
 For example, we may decide to pursue an undergraduate degree at Cambridge University, which then requires us to (i) write an application, (ii) prepare for an interview, and (iii) arrange our travel.
 Each of these processes in turn require us to plan increasingly low-level decisions, such as booking a flight or deciding which bus to take to the airport.
 This is the topic of hierarchical reinforcement learning, which has already been highlighted as a potentially useful model of human behaviour \citep{eckstein2020computational,botvinick2008hierarchical,botvinick2009hierarchically} and is becoming an increasingly important area of research in machine learning \citep{pateria2021hierarchical}.
+While reinforcement learning will undoubtedly be important for understanding such flexible animal behaviour, we should also be careful not to limit ourselves to experimental settings that are easy to model with standard reinforcement learning techniques.
+Instead, we should carefully consider the strengths and limitations of different RL methods for understanding neural computations and behaviour when exploring how this and other frameworks can improve our understanding of biological circuits.
 
-As is the case for hierarchical RL, this review has unfortunately not been able to cover in detail all topics in reinforcement learning that are of interest to neuroscientists.
-A brief overview of this and additional topics of interest is therefore provided in \Cref{sec:additional}, which we hope can also serve as a useful pointer to the broader reinforcement learning literature and some of the active research topics being pursued by the community.
+%As is the case for hierarchical RL, this review has unfortunately not been able to cover in detail all topics in reinforcement learning that are of interest to neuroscientists.
+%A brief overview of this and additional topics of interest is therefore provided in \Cref{sec:additional}, which we hope can also serve as a useful pointer to the broader reinforcement learning literature and some of the active research topics being pursued by the community.

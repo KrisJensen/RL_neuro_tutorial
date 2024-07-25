@@ -20,6 +20,7 @@ This is particularly important in cases where online data collection is expensiv
 Off-policy reinforcement learning is the related problem of learning from a combination of online data and pre-generated data, possibly from a `stale' version of the current agent.
 The off-policy setting is especially relevant to biology, where data collection is expensive and we therefore wish to make maximum use of existing data.
 This can e.g. be achieved through experience replay, which can be prioritized (instead of sampled at random) to maximize future reward and minimize temporal opportunity costs \citep{mattar2018prioritized, agrawal2022temporal,schaul2015prioritized}.
+A variety of `off-policy' policy gradient methods have also been developed to improve sample efficiency, which de-bias the gradients e.g. through the use of importance sampling \citep{espeholt2018impala,jie2010connection,peshkin2002learning,haarnoja2018soft}.
 
 \subsection{Imitation learning}
 \label{sec:imitation}
@@ -28,6 +29,7 @@ However, in contrast to offline RL where we make no assumption about the quality
 This is useful in cases where a large amount of expert data is available, such as the case of autonomous driving \citep{pan2017agile}.
 Imitation learning is clearly important during early development in biological organisms, where we learn from observing the individuals around us.
 Indeed, such imitation learning is a hallmark not just of humans but has also been demonstrated in organisms as `simple' as the bumblebee \citep{loukola2017bumblebees}.
+Imitation learning has also recently been used to learn models of biological neural circuits from high-resolution behavioural data \citep{aldarondo2024virtual}.
 
 \subsection{Linear reinforcement learning}
 \label{sec:linear_RL}
@@ -41,7 +43,7 @@ Similar to how the SR matrix can be seen as describing the dynamics of some `bas
 where $p(s' | s)$ are the prior transition dynamics and $u(s' | s)$ are the controlled transition dynamics marginalized over the policy.
 For $\mathcal{L}_{ctrl}(s)$ to be well-defined, we require $u(s'|s) = 0$ whenever $p(s'|s) = 0$, which prevents impossible transitions even under our flexible controller.
 When subtracting this loss from the RL objective, the resulting utility turns out to be convex in $u$ and can therefore be solved efficiently for the controller, which implicitly specifies the policy.
-This approach has recently been used as an explicit model of biological decision making \citep{piray2021linear}.
+This approach has recently been used as an explicit model of biological decision making \citep{piray2021linear,piray2024reconciling}.
 It also has close parallels to learning and planning as inference \citep{levine2018reinforcement, solway2012goal,botvinick2012planning} and to RL with information bottlenecks \citep{lai2021policy}.
 Both of these families of approaches also involve reinforcement learning with a KL-regularized reward function, and they have also been used as models of biological decision making.
 

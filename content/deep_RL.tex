@@ -2,13 +2,14 @@
 \label{sec:deep_RL}
 
 So far, we have considered the setting of small state- and action-spaces, for which we can simply learn a tabular policy.
-However, in many realistic settings, the state space is large enough that we cannot enumerate all possible states and actions.
-In these cases, we instead have to rely on \emph{function approximation} \citep{sutton2018reinforcement}.
-This approach makes the assumption that similar states will also be associated with similar state-action value functions and should therefore have similar policies.
+Unfortunately, the state space is often large enough that we cannot enumerate all possible states and actions.
+This is true for most biologically realistic settings, where the state and action spaces are effectively unbounded.
+However, novel situations often resembles previously encountered states, requiring agents to generalize shared structure to these new but related settings \citep{botvinick2020deep}.
+In these cases, we can rely on \emph{function approximation} \citep{sutton2018reinforcement} instead of learned tabular state and action values.
+This involves an assumption that similar states will have similar state-action values and should therefore have similar policies.
 By making this assumption, we can generalize to unseen states based on our previous experience, provided that our function approximator is sufficiently good.
-Recent years have seen incredible progress in this setting by using deep or recurrent neural networks as powerful function approximators for reinforcement learning -- the domain of `deep reinforcement learning'.
-This approach has seen an increase in interest not just in the machine learning literature, but recently also as a model of neural dynamics and behaviour in humans and other animals \citep{wang2018prefrontal, jensen2023recurrent, makino2023arithmetic, merel2019deep, banino2018vector}.
-For a more comprehensive overview of the links between deep RL and neuroscience, we refer the interested reader to \citet{botvinick2020deep}.
+Recent years have seen incredible progress in this setting by using deep or recurrent neural networks as powerful function approximators for reinforcement learning -- the domain of `deep reinforcement learning' (deep RL).
+Deep RL has seen increasing interest not just in machine learning, but recently also as a model of neural dynamics and behaviour in humans and other animals \citep{wang2018prefrontal, jensen2023recurrent, makino2023arithmetic, merel2019deep, banino2018vector,aldarondo2024virtual,botvinick2020deep}.
 Modern approaches in (model-free) deep RL can largely be divided into two categories: value-based methods, which compute a set of state-action values that can be used for action selection; and policy gradient methods, which train a neural network to output a policy directly.
 
 \input{./content/deep_Q.tex}
