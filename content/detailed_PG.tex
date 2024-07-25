@@ -1,0 +1,127 @@
+
+\subsubsection*{Policy gradient details}
+
+Here we provide more mathematical details for the policy gradient methods introduced in \Cref{sec:deep_RL}
+
+The conceptually simplest approach for deep reinforcement learning relies on the so-called policy gradient methods \citep{sutton2018reinforcement}.
+In this approach, we train a neural network with parameters $\theta$ to take as input the (observable) state of the environment and directly output a policy $\pi_\theta$.
+Our goal is then to find the setting of $\theta$ that maximizes the expected reward in \Cref{eq:RL_objective}.
+A conceptually simple way to achieve this would be to define $R_\tau := \sum_{t=0}^T \gamma^t r_t$ and use gradient descent with gradients given by
+\begin{align}
+    \nabla_\theta J(\theta) &= \nabla_\theta \mathbb{E}_{\tau \sim p_{\pi_\theta}(\tau)} \left [ R_\tau \right ]\\
+    &= \sum_{\tau} R_\tau \nabla_\theta p_{\pi_\theta}(\tau).
+    \label{eqa:simple_deriv}
+\end{align}
+Here, $\tau \sim p_{\pi_\theta}(\tau)$ indicates trajectories sampled from the distribution over trajectories induced by policy $\pi_\theta$, and $J(\theta)$ indicates the expectation of $R_\tau$ under $p_{\pi_\theta}(\tau)$ (c.f. \Cref{eq:RL_objective}).
+However, evaluating \Cref{eq:simple_deriv} requires us to know how the environment will respond to our actions in order to compute the necessary derivatives, which in general may not be the case (although some model-based deep RL approaches train a differentiable predictive model of the environment to do this; \citealp{clavera2020model}).
+Instead, we use the `log-derivative trick', which takes advantage of the linearity of the expectation and the identity $\nabla_\theta \log f(\theta) = f(\theta)^{-1} \nabla_\theta f(\theta)$ to write
+\begin{align}
+    \label{eqa:deriv_J}
+    \nabla_\theta J(\theta) & = \sum_\tau R_\tau \nabla_\theta p_{\pi_\theta}(\tau) \\
+                            & = \sum_\tau R_\tau p_{\pi_\theta}(\tau) \nabla_\theta \log p_{\pi_\theta}(\tau) \\
+                            & = \mathbb{E}_{\tau \sim p_{\pi_\theta}(\tau)} \left [ R_\tau \nabla_\theta \log p_{\pi_\theta}(\tau) \right ],
+\end{align}
+Since the environment does not depend on $\theta$, we can simplify the calculation of $\nabla_\theta \log p_{\pi_\theta} (\tau)$:
+\begin{align}
+    \label{eqa:deriv_log_ptau}
+    \nabla_\theta \log p_{\pi_\theta}(\tau) & = \nabla_\theta \left [ \log p(s_0) + \sum_{t=0}^T \log p(s_{t+1} | s_t, a_t) + \log \pi_\theta (a_t|s_t) \right ] \\
+                                      & = \sum_{t=0}^T \nabla_\theta \log \pi_\theta (a_t|s_t).
+\end{align}
+Inserting \Cref{eq:deriv_log_ptau} in \Cref{eq:deriv_J} and taking a Monte Carlo estimate of the expectation, we arrive at the REINFORCE algorithm \citep{williams1992simple}:
+\begin{align}
+    \nabla_\theta J(\theta) & = \mathbb{E}_{\tau \sim p_{\pi_\theta}(\tau)} \left [ R_\tau \sum_{t=0}^T \nabla_\theta \log \pi_\theta (a_t|s_t) \right ]                                         \\
+                            & \approx \frac{1}{N} \sum_{\tau \sim p_{\pi_\theta}(\tau)} \left ( \sum_{t=0}^T \gamma^t r_t \right ) \left ( \sum_{t=0}^T \nabla_\theta \log \pi_\theta (a_t|s_t) \right ),
+    \label{eqa:orig_reinforce}
+\end{align}
+where the second line approximates the expectation with $N$ empirical rollouts of the policy in the environment.
+Intuitively, \Cref{eq:orig_reinforce} says that we should preferentially upregulate the probability of trajectories with high reward, which will lead to downregulation of trajectories with lower reward due to the normalization of the policy.
+Importantly, \Cref{eq:orig_reinforce} no longer requires us to differentiate through the environment -- only the policy.
+
+While the REINFORCE algorithm is unbiased, it also has high variance, which can make learning slow and unstable.
+It is therefore common to introduce modifications, which can help reduce the variance.
+The first of these comes from noting that an action taken at time $t$ cannot affect the reward received at times $t'<t$.
+This allows us to define $R_t := \sum_{t'=t}^T \gamma^{t'-t} r_{t'}$ and rewrite our REINFORCE update as
+\begin{equation}
+    \label{eqa:reinforce}
+    \nabla_\theta J(\theta) \approx \frac{1}{N} \sum_{\tau \sim p_{\pi_\theta}(\tau)}  \sum_{t=0}^T R_t \nabla_\theta \log \pi_\theta (a_t|s_t).
+\end{equation}
+This is the formulation most commonly used, but it is worth noting that it is actually \emph{not} the same as \Cref{eq:orig_reinforce}, which would require us to use $R_t= \sum_{t'=t}^T \gamma^{t'-0} r_{t'}$.
+As briefly discussed in \Cref{sec:problem_setting}, this is because the discount factor $\gamma$ is generally used as a variance reduction method rather than an indication that we intrinsically care less about rewards later in the task, although \Cref{eq:reinforce} is also consistent with an interpretation of $(1-\gamma)$ as a termination probability.
+
+It is also straightforward to show that for a baseline $B(s_t)$ that does not depend on $a_t$,
+\begin{align}
+    \mathbb{E}_{s_t, a_t \sim p_{\pi_\theta}(s_t, a_t)} \left [ B(s_t) \nabla_\theta \log \pi_\theta (a_t|s_t) \right ]
+     & = \int_{s_t} B(s_t) p(s_t) \left [ \nabla_\theta \int_{a_t} \pi_\theta (a_t|s_t) da_t \right ] ds_t \\
+     & = \int_{s_t} B(s_t) p(s_t) \left [ \nabla_\theta 1 \right ] ds_t = 0.
+\end{align}
+A corollary of this result is that we can subtract such a baseline from our empirical reward and still have an unbiased estimator while potentially reducing its variance.
+A common choice here is the expected future reward
+\begin{equation}
+    V(s_t) = \mathbb{E} \left [ \sum_{t' = t}^T \gamma^{t'=t} r_{t'} | s_t \right ]
+\end{equation}
+This gives rise to the so-called `actor-critic' algorithm
+\begin{equation}
+    \label{eqa:AC}
+    \nabla_\theta J(\theta) \approx \frac{1}{N} \sum_{\tau \sim p_{\pi_\theta}(\tau)}  \sum_{t=0}^T (R_t - V(s_t)) \nabla_\theta \log \pi_\theta (a_t|s_t).
+\end{equation}
+Intuitively, \Cref{eq:AC} says that we should upregulate the probability of actions that lead to higher-than-expected reward and downregulate the probability of actions that lead to lower-than-expected reward.
+Interestingly, many studies in the neuroscience literature have suggested that the brain could be using something akin to an actor-critic algorithm, with dorsal striatum implementing the `actor' and ventral striatum the `critic' \citep{takahashi2008silencing,sutton2018reinforcement}.
+
+Finally, it is common to reduce the variance of our gradient estimator through an approach known as `bootstrapping'.
+To implement this, we note that
+\begin{equation}
+    \mathbb{E} \left [ R_t \right ] = \mathbb{E}[r_t + \gamma V(s_{t+1})].
+\end{equation}
+This is useful because $r_t + \gamma V(s_{t+1})$ has lower variance than $R_t$, so using this bootstrapped estimate of the reward-to-go can reduce the noise in our gradient estimate when using finite sample sizes.
+We therefore use $r_t + \gamma V(s_{t+1})$ to define the `advantage function' $A_t = r_t + \gamma V(s_{t+1}) - V(s_t)$, which gives rise to the `advantage actor-critic' (A2C) algorithm:
+\begin{equation}
+    \nabla_\theta J(\theta) \approx \frac{1}{N} \sum_{\tau \sim p_{\pi_\theta}(\tau)}  \sum_{t=0}^T (r_t + \gamma V(s_{t+1}) - V(s_t)) \nabla_\theta \log \pi_\theta (a_t|s_t).
+\end{equation}
+While we have considered two extreme cases of a full Monte Carlo estimate of $R_t$ and a `one-step' bootstrap, the sum in $R_t$ can be truncated to any order with $R_{t'}$ replaced by $V(s_{t'})$.
+In theory, this estimator remains unbiased if our value function is correct.
+However, in practice the estimate of $V(s_{t'})$ learned by our critic will be inexact, which introduces a bias to our parameter updates.
+The bootstrapping procedure outlined above thus leads to a tradeoff between the bias and variance of our parameter updates, and the optimal tradeoff will depend on the problem setting, network architecture, and training paradigm being used.
+
+For these actor-critic algorithms, it is common to parameterize both the policy $\pi_\theta(a_t|s_t)$ and the value function $V_\phi(s_t)$ with neural networks -- often with a subset of shared parameters between $\theta$ and $\phi$.
+This leaves the problem of updating the parameters.
+In order to use out-of-the-box automatic differentiation software, we do this by defining an auxiliary utility (i.e. negative loss)
+\begin{equation}
+    \label{eqa:Jtilde}
+    \tilde{J}(\theta) = \frac{1}{N} \sum_{\tau \sim p_{\pi_\theta}(\tau)}  \sum_{t=0}^T (R_t - V(s_t)) \log \pi_\theta (a_t|s_t),
+\end{equation}
+where $R_t$ and $V(s_t)$ are treated as constant w.r.t. $\theta$.
+In \Cref{eq:Jtilde} and the following equations, we can use either the empirical reward-to-go $R_t = \sum_{t' \geq t} \gamma^{t'-t} r_{t'}$, or we can use the bootstrapped estimate $R_t \approx r_t + \gamma V(s_{t+1})$.
+While $\tilde{J}(\theta)$ has no intrinsic interpretation, it is chosen such that
+\begin{equation}
+    \nabla_\theta \tilde{J}(\theta) = \nabla_\theta J(\theta).
+\end{equation}
+
+The gradient of the value function loss (i.e. negative utility) is given by
+\begin{equation}
+    \nabla_\phi \mathcal{L}_V = \nabla_\phi \sum_t \frac12  (R_t - V_\phi(s_t))^2 = \sum_t - (R_t - V_\phi(s_t)) \nabla_\phi V_\phi(s_t).
+\end{equation}
+When $\pi_\theta$ and $V_\phi$ share parameters, we also need to balance the gradients w.r.t. $\theta$ and $\phi$ in our update step.
+We do this by defining $\delta_t := R_t - V(s_t)$ (or $\delta_t := r_t + \gamma V(s_{t+1}) - V(s_t)$), introducing a hyperparameter $\beta_V$, and maximizing the joint utility
+\begin{equation}
+    \mathcal{L} = \frac{1}{N} \sum_{\tau \sim p_{\pi_\theta}(\tau)} \sum_{t=0}^T ( \log \pi_\theta (a_t|s_t) + \beta_V V_\phi(s_t) ) \delta_t .
+\end{equation}
+Importantly, we do not propagate gradients w.r.t. $\phi$ or $\theta$ through the computation of $\delta_t$.
+Finally, it is also common to add an auxiliary entropy loss of the form $\mathcal{L}_E = \beta_E \frac{1}{N} \sum_{\tau \sim p_{\pi_\theta}(\tau)} \sum_{t=0}^T \sum_a \pi_\theta (a_t|s_t) \log \pi_\theta (a_t|s_t)$ to encourage exploration.
+
+While these policy gradient methods may seem far removed from neuroscience, they have had several applications in the field in recent years.
+For example, \citet{li2022integrating} recently demonstrated that an off-policy variant known as the `soft actor-critic' algorithm \citep{haarnoja2018soft} can be used to train an agent that shapes the behaviour of \textit{C. elegans} via an optogenetic action space.
+Networks trained with policy gradient algorithms have also recently attracted significant interest as models of learning and neural dynamics in the biological brain \citep{wang2018prefrontal, jensen2023recurrent, merel2019deep}.
+Of particular interest, \citet{wang2018prefrontal} suggested that frontal cortex can be well described as a \emph{recurrent} deep RL agent, where the RNN parameters are configured by learning from rewards over long periods of time from many tasks that have a shared underlying structure.
+Importantly, this `slow' model-free learning process gives rise to an agent that can rapidly learn from experience with \emph{fixed parameters} when exposed to a new task from the same distribution.
+This is achieved by the agent learning to effectively implement a fast RL-like algorithm in the \emph{dynamics} of the network (\Cref{fig:meta}).
+This process, whereby an agent trained slowly on a large distribution of tasks can rapidly adapt to a new task, is known as `meta-reinforcement learning' and is a popular area of research in machine learning \citep{finn2017model, ritter2018been, duan2016rl, wang2016learning}.
+\citet{wang2018prefrontal} showed that such as meta-RL model can explain a range of neuroscientific findings, including
+\begin{itemize}
+    \item Dynamic adaptation of the effective learning rate of an agent to the volatility of the environment \citep{behrens2007learning}.
+    \item The emergence of `model-based' behaviour in the `two-step' task commonly used to distinguish between model-free and model-based RL \citep{miller2017dorsal,daw2011model}.
+    \item The ability of animals to get progressively faster at learning when exposed to multiple tasks with a consistent abstract task structure \citep{harlow1949formation}.
+\end{itemize}
+Further evidence for this meta-RL framework comes from \citet{hattori2023meta}, who showed that across-session learning in a reversal learning task relied on synaptic plasticity in orbitofrontal cortex (OFC; a subregion of PFC), while within-session learning relied on recurrent dynamics in OFC.
+Recently, \citet{jensen2023recurrent} also extended the work of \citet{wang2018prefrontal} to allow the meta-RL agent to learn not just from physical experience, but also from imagined experience using a learned model of the environment.
+This resulted in an agent that computes an intial model-free policy, which can be adaptively improved with model-based computations when the resulting policy improvement makes up for the temporal opportunity cost of the model-based computation.
+Interestingly, the response times of the resulting agent mirrored those of human participants in a maze navigation task, where the agent similarly spent more time `thinking' early in a trial and far from the goal.

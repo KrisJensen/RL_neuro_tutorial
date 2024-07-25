@@ -8,24 +8,24 @@ Additionally, research suggests that dopamine activity reflects not just state v
 This suggests an alternative algorithm for biological learning, where animals learn \emph{state-action values} in what is known as `Q-learning'.
 Such Q-learning models have been commonly used to explain animal behaviour and neural activity \citep{niv2009reinforcement, mattar2018prioritized}
 
-To understand this algorithm, we first need to define the state-action values under policy $\pi$, $Q_\pi(s, a)$:
+To understand this algorithm, we first need to define the state-action values under policy $\pi$, $Q^\pi(s, a)$:
 \begin{equation}
     \label{eq:Q-values}
-    Q_\pi(s,a) =  \mathbb{E}_{\tau \sim p_\pi(\tau)} \left [ \sum_{t'=t} \gamma^{t' - t} r_{t'} | s_{t} = s, a_{t} = a \right ].
+    Q^\pi(s,a) =  \mathbb{E}_{\tau \sim p_\pi(\tau)} \left [ \sum_{t'=t} \gamma^{t' - t} r_{t'} | s_{t} = s, a_{t} = a \right ].
 \end{equation}
-Given $Q_\pi$, it is simple to perform action selection by taking the action with the highest expected reward in a given state,
+Given $Q^\pi$, it is simple to perform action selection by taking the action with the highest expected reward in a given state,
 \begin{equation}
-    a^*(s) = \text{argmax}_{a} Q_\pi(s, a).
+    a^*(s) = \text{argmax}_{a} Q^\pi(s, a).
 \end{equation}
 To learn the $Q$-values necessary for such action selection, we start by expanding \Cref{eq:Q-values},
 \begin{equation}
     \label{eq:Q-expanded}
-    Q_\pi(s,a) = r(s, a) + \gamma \sum_{s'} p(s_{t+1} = s'| s_t=s, a_t=a) \sum_{a'} \pi(a' | s') Q_\pi(s', a').
+    Q^\pi(s,a) = r(s, a) + \gamma \sum_{s'} p(s_{t+1} = s'| s_t=s, a_t=a) \sum_{a'} \pi(a' | s') Q^\pi(s', a').
 \end{equation}
-For the greedy policy $\pi^g(a|s) := I_{a = a^*(s)}$, this gives rise to a self-consistency expression for the state-action values:
+For the greedy policy $\pi^g(a|s) := I_{a = a^*(s)}$ (where the indicator function $I_{a = b}$ is 1 for $a=b$ and $0$ otherwise), this gives rise to a self-consistency expression for the state-action values:
 \begin{equation}
     \label{eq:Q-optimal}
-    Q_{\pi^g}(s,a) = r(s, a) + \gamma \mathbb{E}_{s' \sim p(s' | s, a)} \left [ \text{max}_{a'} Q_{\pi^g}(s', a') \right ].
+    Q^{\pi^g}(s,a) = r(s, a) + \gamma \mathbb{E}_{s' \sim p(s' | s, a)} \left [ \text{max}_{a'} Q^{\pi^g}(s', a') \right ].
 \end{equation}
 Importantly, this self-consistency expression only holds when the Q-values have converged to the true expected rewards, and the associated greedy policy is therefore optimal \citep{sutton2018reinforcement}.
 We can now use \Cref{eq:Q-optimal} as an objective by defining
@@ -41,8 +41,8 @@ Gradient descent w.r.t $Q(s,a)$ gives us an update rule
 This is the so-called Q-learning update rule (\citealp{watkins1989learning}; \Cref{fig:Q}A), where we have estimated the expectation with the single sample actually seen by the agent in the last line.
 
 Q-learning is guaranteed to converge to the optimal policy in the limit of infinitesimal learning rates and infinite sampling of the state-action space \citep{watkins1992q,sutton2018reinforcement}.
-However, following the greedy policy $a^*(s) = \text{argmax}_{a} Q(s, a)$ before convergence of the Q values can lead to undersampling of the state-action space and poor performance.
-It is therefore common to either use an `$\epsilon$-greedy' policy, $\pi(a|s) = \epsilon / |\mathcal{A}| + (1-\epsilon) I_{a = a^*(s)}$, or a softmax-policy, $\pi(a|s) \propto \text{exp}(\beta Q(s, a))$, to collect the experience used to update the Q values (\Cref{fig:Q}B).
+However, following the greedy policy $a^*(s) = \text{argmax}_{a} Q(s, a)$ before convergence of the Q-values can lead to undersampling of the state-action space and poor performance.
+It is therefore common to either use an `$\epsilon$-greedy' policy, $\pi(a|s) = \epsilon / |\mathcal{A}| + (1-\epsilon) I_{a = a^*(s)}$, or a softmax-policy, $\pi(a|s) \propto \text{exp}(\beta Q(s, a))$, to collect the experience used to update the Q-values (\Cref{fig:Q}B).
 Such exploration strategies and their biological correlates are discussed in more detail in \Cref{sec:scalar_rew}.
 
 These approaches make Q-learning an `off-policy' algorithms, since the policy used in the learning update (the greedy policy) is different from the policy used for action selection (the stochastic policy).
@@ -50,9 +50,9 @@ An on-policy version of Q-learning known as `SARSA' (state-action-reward-state-a
 \begin{align}
     \Delta  Q(s_t,a_t) \propto - Q(s_t,a_t) + r_t + \gamma Q(s_{t+1}, a_{t+1}).
 \end{align}
-This will converge to the true Q values for a given policy $\pi$, similar to how the TD learning rule in \Cref{eq:TD-learning} is guaranteed to converge to the true value function for a given policy, again under assumptions of infinite sampling of the space.
+This will converge to the true Q-values for a given policy $\pi$, similar to how the TD learning rule in \Cref{eq:TD-learning} is guaranteed to converge to the true value function for a given policy, again under assumptions of infinite sampling of the space.
 
-In settings where animals have to choose between multiple actions with different values, studies have found evidence for midbrain dopamine neurons encoding either quantities resembling the prediction error used for Q learning \citep{roesch2007dopamine,niv2009reinforcement} or SARSA \citep{morris2006midbrain,niv2009reinforcement}.
+In settings where animals have to choose between multiple actions with different values, studies have found evidence for midbrain dopamine neurons encoding either quantities resembling the prediction error used for Q-learning \citep{roesch2007dopamine,niv2009reinforcement} or SARSA \citep{morris2006midbrain,niv2009reinforcement}.
 These findings suggest that such algorithms may not just be abstract learning algorithms but instead have pluasible implementations in biological neural circuits.
 However, the methods considered here and in the previous section also have severe shortcomings.
 For example, the amount of data needed to learn state(-action) values in an environment assumed to be stationary can be prohibitive for animals needing to act in a rapidly changing world, where bad decisions can have fatal consequences.

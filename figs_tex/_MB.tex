@@ -13,7 +13,7 @@
         The MB agent requires substantially less experience than the MF agent for a given level of performance.
         {\bfseries (B)}~Wallclock time needed to run 100 episodes of cliffworld with either the MB or MF agents from (A), as a function of the length of the environment.
         Although (A) shows that the MB agent requires substantially less experience to learn a good policy, the wallclock time per episode was much larger than that required by the MF agent.
-        This illustrates an important balance between model-based and model-free reinforcement learning, where MF methods usually require more experience but MB methods require more compute for a given level of experience.
+        This illustrates an important balance between model-based and model-free reinforcement learning, where MF methods usually require more experience but MB methods require more compute at decision time.
         In domains such as robotics, where collecting data is very time consuming, MB methods can still be a more efficient way to reach a high level of performance.
         {\bfseries (C)}~Learning curve for an agent using the successor representation (SR) together with learning curves for the model-based agent in (A) and the greedy TD-agent from \Cref{fig:TD}.
         At episode 40 (vertical black line), the goal was moved from location (9, 0) to location (0, 4), and location (9, 0) was instead given a reward of -5.

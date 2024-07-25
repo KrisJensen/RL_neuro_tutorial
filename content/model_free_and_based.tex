@@ -9,7 +9,7 @@ This is incompatible with many aspect of animal behaviour, which we know is adap
 
 On the other hand, `model-based' reinforcement learning uses a model of the world to simulate the consequences of different actions at decision time.
 This can be much more data efficient, since learning a world model is often simpler than learning a full policy (\Cref{fig:MB}A).
-In machine learning settings, model-based RL has exhibited impressive performance across a range of tasks with large state spaces, including Atari, chess, shogi, and Go \citep{silver2018general, schrittwieser2020mastering, deisenroth2011pilco}
+In machine learning settings, model-based RL has exhibited impressive performance across a range of tasks with large state spaces, including Atari, chess, shogi, and Go \citep{silver2018general, schrittwieser2020mastering, deisenroth2011pilco}.
 In a biological context, the idea of first learning a model of the environment, and then using it to guide reward-driven behaviour also provides one plausible explanation for latent learning and other types of rapid adaptation.
 However, model-based decision making can be computationally intensive at decision-time, which is a challenge for animals that rely on rapid decision making for survival (\Cref{fig:MB}B).
 
@@ -25,6 +25,9 @@ This can be done for example by expanding the Q-value relation from \Cref{eq:Q-o
     &= \ldots
 \end{align}
 }
+
+\vspace{-2 em}
+
 If the environment is determinstic, $p(s_{t+1} | s_t, a_t)$ is a delta function, and otherwise the next-state expectations may need to be approximated with multiple samples.
 Unfortunately, the optimization over all possible action sequences in \Cref{eq:Q-search} is in general an exponentially large search problem in the planning depth, which makes it infeasible for any reasonably sized problem setting.
 It is therefore common to either use `depth-first search' with limited breadth, or `breadth-first search' with limited depth.
@@ -48,5 +51,5 @@ A different line of research has explicitly investigated the trade-offs between 
 A popular paradigm for such studies attempting to distinguish between model-free and model-based behaviour is the so-called `two-step' task developed by Daw and colleagues (\citealp{daw2011model,momennejad2017successor,wang2018prefrontal}; although note \citealp{akam2015simple}).
 
 It has generally been accepted that humans can use both model-free and model-based decision making, with the dorsolateral striatum being particularly important for model-free reinforcement learning \citep{yin2004lesions, yin2005role}, and the dorsomedial striatum, prefrontal cortex, and hippocampal formation being important for model-based decision making \citep{vikbladh2019hippocampal,geerts2020general,miller2017dorsal,niv2009reinforcement,killcross2003coordination}.
-This also has interesting parallels to recent work in the motor learning literature, where the basal ganglia were found to be sufficient for `habitual' motor sequences even in the absence of motor cortex, while motor cortex was necessary for more flexible motor behaviours that are likely to require a high-level `schema' of the task structure \citep{mizes2023motor,mizes2023dissociating}.
+This also has interesting parallels to recent work in motor learning, where the basal ganglia were found to be sufficient for `habitual' motor sequences even in the absence of motor cortex, while motor cortex was necessary for more flexible motor behaviours that are likely to require a high-level `schema' of the task structure \citep{mizes2023motor,mizes2023dissociating}.
 In \Cref{sec:scalar_rew} we will see how combining these model-based and model-free ideas with deep learning can also lead to human-level performance in tasks such as chess and Go that require long-term planning, and how such algorithms can provide inspiration for future studies of neuroscience and behaviour.

@@ -1,16 +1,16 @@
 \section{Discussion}
 \label{sec:discussion}
 
-In this work, we have provided a mathematical overview of some of the many reinforcement learning methods that are commonly used in systems and computational neuroscience.
-We have also highlighted a range of explicit parallels between these methods and findings in the neuroscience and cognitive science literature to illustrate the utility of reinforcement learning as a framework for understanding biological learning and decision making.
+In this review, we have provided a mathematical overview of some of the many reinforcement learning methods that are commonly used in systems and computational neuroscience.
+We have also highlighted a range of explicit parallels between these methods and experimental results in neuroscience and cognitive science to illustrate the utility of reinforcement learning as a framework for understanding biological learning and decision making.
 This has ranged from classical work on reward prediction errors \citep{schultz1997neural} to recent findings on the plausibility of distributional reinforcement learning in biological circuits \citep{dabney2020distributional}.
 
 While RL has thus already had a profound influence on systems neuroscience, several open questions remain.
-In particular, much of the work in neuroscience has focused on simple stimulus-response or binary decision making tasks.
+In particular, much work in neuroscience has focused on simple stimulus-response or binary decision making tasks.
 This is a far reach from ethologically relevant problems that involve processing complex multimodal stimuli, decision making with long-lasting consequences, and complex high-dimensional motor control.
 Some recent work building on deep RL has started to bridge this gap.
-For example, \citet{banino2018vector} showed the emergence of grid cells in agents navigating complex environments, \citet{aldarondo2024virtual} showed similarities between an RL agent trained to control a virtual rodent and corresponding biological motor representations, and \citet{jensen2023recurrent} showed parallels between a recurrent meta-RL agent and human behaviour in a navigation task requiring temporally extended thinking.
-However, much work remains to be done to extend our neuroscientific findings to ethologically relevant settings, both on the experimental side and on the computational side.
+For example, \citet{banino2018vector} demonstrated the emergence of grid cells in agents navigating complex environments, \citet{aldarondo2024virtual} showed similarities between an RL agent trained to control a virtual rodent and corresponding biological motor representations, and \citet{jensen2023recurrent} showed parallels between a recurrent meta-RL agent and human behaviour in a navigation task requiring temporally extended thinking.
+However, much work remains to extend our neuroscientific understanding to ethologically relevant settings, both experimental and computational.
 
 A related challenge will be to combine different components of existing models to capture the generalist nature of biological circuits.
 This is in contrast to past work, which has often focused on a single neural circuit or function, such as motor control or navigation.
@@ -18,13 +18,16 @@ Such a generalist approach will involve explicit modeling of the roles of differ
 Clearly, such models will need to be constrained by experimental data, both at the level of behaviour and at the level of neural activity.
 This is becoming increasingly feasible with recent advances in recording technologies, both for high-resolution behavioural tracking \citep{mathis2018deeplabcut,dunn2021geometric} and for simultaneous and long-term recording of neural activity \citep{steinmetz2021neuropixels, pachitariu2016suite2p, dhawale2017automated}.
 
-Finally, most work on reinforcement learning in a neuroscientific context has considered short-term decision making tasks, where planning and decision making in primitive state and action spaces is feasible.
-This is in stark contrast to most human decision making, which occurs over extended timescales and often involves hierarchies of decisions.
+Finally, most work on reinforcement learning in neuroscience has considered short-term decision making tasks, where planning and decision making in primitive state and action spaces are feasible.
+This is in stark contrast to most human decision making, which occurs over extended timescales and often involves hierarchies of decisions or priorities that change over time.
 For example, we may decide to pursue an undergraduate degree at Cambridge University, which then requires us to (i) write an application, (ii) prepare for an interview, and (iii) arrange our travel.
 Each of these processes in turn require us to plan increasingly low-level decisions, such as booking a flight or deciding which bus to take to the airport.
 This is the topic of hierarchical reinforcement learning, which has already been highlighted as a potentially useful model of human behaviour \citep{eckstein2020computational,botvinick2008hierarchical,botvinick2009hierarchically} and is becoming an increasingly important area of research in machine learning \citep{pateria2021hierarchical}.
-While reinforcement learning will undoubtedly be important for understanding such flexible animal behaviour, we should also be careful not to limit ourselves to experimental settings that are easy to model with standard reinforcement learning techniques.
-Instead, we should carefully consider the strengths and limitations of different RL methods for understanding neural computations and behaviour when exploring how this and other frameworks can improve our understanding of biological circuits.
+While reinforcement learning will undoubtedly remain important for understanding such flexible animal behaviour, we should also keep in mind the shortcomings and challenges of learning from scalar rewards (\Cref{sec:scalar_rew}).
+It will be important to investigate the regimes in which reinforcement learning provides a good model of behaviour and neural dynamics, while also exploring other frameworks with potentially richer learning substrates, and studying the interactions between such different learning algorithms.
+
+%While reinforcement learning will undoubtedly be important for understanding such flexible animal behaviour, we should also be careful not to limit ourselves to experimental settings that are easy to model with standard reinforcement learning techniques.
+%Instead, we should carefully consider the strengths and limitations of different RL methods for understanding neural computations and behaviour when exploring how this and other frameworks can improve our understanding of biological circuits.
 
 %As is the case for hierarchical RL, this review has unfortunately not been able to cover in detail all topics in reinforcement learning that are of interest to neuroscientists.
 %A brief overview of this and additional topics of interest is therefore provided in \Cref{sec:additional}, which we hope can also serve as a useful pointer to the broader reinforcement learning literature and some of the active research topics being pursued by the community.

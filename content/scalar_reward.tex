@@ -1,0 +1,49 @@
+
+\section{Learning from scalar rewards -- or not?}
+\label{sec:scalar_rew}
+
+The methods discussed so far have all relied on some scalar `reward' available from the environment.
+Distributional RL predicted the full distribution of possible rewards, but it still assumed that an external reward was eventually observed.
+This is perhaps reasonable in many experimentally controlled settings, where we deliver juice or water to animals as a function of their actions.
+It is also appropriate in machine learning settings, where we want to optimize some externally imposed objective that can be quantified.
+However, in natural environments, there is no such natural definition of `reward' -- instead, different actions can be rewarded in different ways and must be converted to an internal learning signal \citep{juechems2019does}.
+For example, foraging for food might reduce hunger, while collecting water might reduce thirst.
+Starting a family might have an initial energy cost, but it could improve survival later in life and propagate the gene pool.
+An RL purist would have to convert all of these different gains and losses into a single common unit and balance them appropriately to decide what actions to take \citep{silver2021reward}.
+However, it has also been suggested that biological networks adaptively change the instantaneous objective of an agent via a higher order controller that determines what the current lower-level objective is \citep{juechems2019does,miller2001integrative}.
+This resembles ideas in hierarchical reinforcement learning \citep{pateria2021hierarchical}, but where the higher-order policies are not necessarily learned through reinforcement learning within a lifetime, instead emerging during evolution where survival depended on optimizing `useful' objectives.
+
+A related challenge is the technical difficulty of learning from scalar rewards, which are generally sparse.
+While the methods in \Cref{sec:deep_RL} can train a neural network to maximize reward in theory, in practice they are often noisy, unstable, or find local minima.
+As a topical example, consider the challenge of training large language models to interact with human users.
+Training such a model from scratch using reinforcement learning would be near-impossible, but `pretraining' the model on a large unsupervised dataset followed by `reinforcement learning from human feedback' has proven hugely successful and revolutionized large language models for human interactions \citep{team2023gemini}.
+This works because the large unlabelled dataset provides a way to learn good \emph{representations} that distinguish different concepts, since this is necessary to solve the base task of predicting the next word.
+Once such representations are learned, the subsequent finetuning for human interactions is an easier problem that can be solved with reinforcement learning.
+
+Of more relevance to neuroscience, it is also common in deep RL to introduce additional `auxiliary costs' to the utility function that are jointly optimized together with reward maximization, and which can use a richer data source to drive representation learning in the network \citep{jaderberg2016reinforcement}.
+A popular approach is to include predictive losses that require the agent to predict the next observation from the current state and action \citep{jaderberg2016reinforcement, zintgraf2019varibad}.
+Such predictive losses have close parallels in neuroscience, where it has been suggested that predictive learning could result in many of the representations observed in biological circuits \citep{rao1999predictive, stachenfeld2017hippocampus, whittington2020tolman, blanco2021dopamine} and serve as a foundation for model-based planning \citep{jensen2023recurrent}.
+\citet{fang2023predictive} also recently showed that augmenting an RL agent with an auxiliary predictive objective leads to neural representations that resemble biological circuits more closely.
+This suggests a potentially important interaction between self-supervised representation learning and reward-driven reinforcement learning in biological circuits.
+
+If a good predictive model of the world is learned, this model can also be used to turn the reinforcement learning problem into a supervised learning problem, which will generally have lower variance gradients.
+Consider for example the seminal MuZero algorithm developed by \citet{schrittwieser2020mastering}, which was used to train a network to solve Atari, chess, shogi, or Go.
+This neural network was trained to predict future representations and reward, and then used Monte Carlo tree search (MCTS; a model based-search algorithm c.f. \Cref{sec:model_free_based}) to select good actions.
+These actions, which had been optimized using MCTS, were then treated as a supervised learning target by training the base policy network to predict the actions selected by the MCTS algorithm.
+Through many iterations of such predictive learning, MCTS-based action selection, and policy improvement by gradient descent, the network learned both the transition structure of the task and how to select good actions.
+%Importantly, the MCTS-based policy improvement step relied on learning a good world model for simulating the effects of different actions.
+Such semi-supervised approaches to reinforcement learning are useful in settings where learning the transition structure of the world is easier than learning a policy \citep{jensen2023recurrent}, which is often the case.
+
+Finally, algorithms that seek to maximize scalar rewards often run into challenges related to exploration.
+In particular, once an above-average policy has been identified, exploration is disfavored because it has lower expected reward, even if there is a finite probability of discovering new and better policies.
+This is why imposing stochasticity in the form of e.g. $\epsilon$-greedy policies is common in the tabular RL literature.
+In deep RL, it is instead popular to include various forms of `exploration bonuses' in the objective function.
+Policy gradient algorithms for example often add an auxiliary entropy loss of the form $\mathcal{L}_E = \sum_{\tau \sim p_{\pi_\theta}(\tau)} \sum_{t=0}^T \sum_a \pi_\theta (a_t|s_t) \log \pi_\theta (a_t|s_t)$, and indeed the simple example in \Cref{fig:meta} does not work without such an entropy loss.
+Other approaches to improve exploration include hierarchical reinforcement learning, which introduces autocorrelations in the policy to improve coverage of the state space.
+This is reminiscent of the biological `Lévy flight' hypothesis, which suggests that animals explore an environment using a heavy-tailed distribution of `step sizes' to maximize the probability of finding sparse rewards \citep{viswanathan1999optimizing}.
+Biological agents are also thought to engage in periods of `random exploration' that can be interpreted as a biological parallel to $\epsilon$-greedy-like algorithms.
+Random exploration appears to be under noradrenergic control \citep{tervo2014behavioral, dubois2021human}, while the zona incerta can drive more directed exploration \citep{ahmadlou2021cell}.
+Such neural control of exploration is also well-established in the zebra finch song circuit \citep{olveczky2005vocal}, and it is consistent with a view of top-down imposition of flexible reward functions -- where one possible objective could be to increase variability or reduce uncertainty -- rather than optimization of a global scalar reward.
+
+
+
