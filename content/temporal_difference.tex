@@ -36,7 +36,7 @@ Gradient descent w.r.t $V(s)$ gives us an update rule
 The last line approximates the expected update with a single sample corresponding to the states and reward actually experienced.
 As more and more experience is collected and many small gradient steps are taken according \Cref{eq:TD-learning}, these single-sample estimates will average out to the expectation in \Cref{eq:TD-learning_exp} (\Cref{fig:TD}A).
 Variants of this algorithm can also learn about multiple past states at once using the notion of \emph{eligibility traces} \citep{sutton2018reinforcement}.
-However, \Cref{eq:TD-learning} is the canonical temporal difference learning rule \citep{sutton1988learning}, and it leads to learning dynamics where the temporal difference error $\delta := - V(s_t) + r(s_t) + \gamma V(s_{t+1})$ is progressively propagated from the rewarding state to prior states that predict the upcoming reward.
+However, \Cref{eq:TD-learning} is the canonical temporal difference learning rule \citep{sutton1988learning}, and it leads to learning dynamics where the temporal difference error $\delta := - V(s_t) + r(s_t) + \gamma V(s_{t+1})$ is progressively propagated from the rewarding state to prior states that predict the upcoming reward (\Cref{fig:TD}C).
 
 This gradual propagation of value prediction errors from rewarding states to prior states that predict upcoming reward has been of great interest in neuroscience.
 In particular, classical work by \citet{schultz1997neural} demonstrated a similar pattern of neural activity in dopaminergic VTA neurons, which formed the foundation of a now well-established theory that dopamine provides a biological prediction error signal that drives reward-guided learning \citep{niv2009reinforcement}.
@@ -56,6 +56,6 @@ We can then perform action selection by choosing the action with the highest exp
     \label{eq:value_action_selection}
     a^*(s) = \text{argmax}_{a} \left ( r(s, a) + \gamma \sum_{s'} p(s' | s, a) V(s') \right ).
 \end{equation}
-Updating the value function according to \Cref{{eq:TD-learning}} while acting in the environment according to \Cref{{eq:value_action_selection}} leads to an agent that gradually learns to take better actions as it learns a better value function (\Cref{fig:TD}B-C).
+Updating the value function according to \Cref{{eq:TD-learning}} while acting in the environment according to \Cref{{eq:value_action_selection}} leads to an agent that gradually learns to take better actions as it learns a better value function (\Cref{fig:TD}B-D).
 This provides a potentially biologically plausible algorithm for reward-driven learning in agents with access to a one-step predictive model.
 

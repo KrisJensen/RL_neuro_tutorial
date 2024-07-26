@@ -16,7 +16,7 @@ Clearly, the expectation of $Z^\pi(s, a)$ equals the corresponding Q value:
 \end{equation}
 Instead of only estimating this expectation, we now want to learn the full distribution of returns, $p_{z^\pi}(Z^\pi(s, a))$.
 One normative reason to learn this distribution is to develop methods that are risk averse \citep{morimura2010nonparametric,morimura2012parametric} or explicitly take into account uncertainty \citep{dearden1998bayesian}.
-However, recent work has suggested that such a distributional approach can also increase expected reward by improving representation learning in the deep RL setting \citep{bellemare2017distributional,dabney2018distributional,rowland2019statistics,bellemare2023distributional}.
+However, recent work has suggested that such a distributional approach can also increase expected reward by improving representation learning in the deep RL setting (\Cref{fig:dist}A; \citealp{bellemare2017distributional,dabney2018distributional,rowland2019statistics,bellemare2023distributional}).
 This is because traditional deep RL only learns to distinguish states that have different expected value, while distributional RL learns to distinguish any states that have different cumulative return distributions.
 
 To learn $p_{z^\pi}(Z^\pi(s, a))$, one option is to define a set of `atoms' that tile the (anticipated) support of the distribution and then discretize the distribution by assigning the full probability mass to these discrete locations.
@@ -32,7 +32,7 @@ A distribution is uniquely specified by its expectiles, and we can therefore rep
 Translating this to an RL algorithm involves training a network (or tabular values) to predict a set of expectiles for a given state (and action).
 The parameters of the agent are then updated by propagating the distribution implied by the predicted expectiles through the Bellman equation and minimizing the difference between the initial and propagated distributions \citep{bellemare2023distributional}.
 
-In the tabular value learning case (c.f. \Cref{sec:temporal_difference}), this turns out to be particularly simple to do using a modified TD-update rule (c.f. \Cref{eq:TD-learning}; \citealp{lowet2020distributional}; \Cref{fig:dist}A).
+In the tabular value learning case (c.f. \Cref{sec:temporal_difference}), this turns out to be particularly simple to do using a modified TD-update rule (c.f. \Cref{eq:TD-learning}; \citealp{lowet2020distributional}; \Cref{fig:dist}B).
 In particular, we consider a set of units $\{ V_{\tau_i}(s) \}$, each with a target expectile $\tau_i := \frac{\alpha_i^+}{\alpha_i^+ + \alpha_i^-}$ of the return distribution $p_{z^\pi}(Z^\pi(s))$ (where $p_{z^\pi}(Z^\pi(s)) = \sum_a \left [ \pi(a|s) p_{z^\pi}(Z^\pi(s)) \right ] $).
 These expectiles can be learned by sampling experience from the environment under the policy and defining a TD error for each unit and state transition as
 \begin{align}
@@ -59,12 +59,12 @@ More concretely, they showed that:
 \begin{itemize}
     \item The VTA neurons exhibited a range of different `reversal points' -- defined as the reward magnitude at which the firing rate of a neuron did not change from its baseline firing rate.
     This is consistent with a distributional RL theory, where the changes in neural firing rates from baseline correspond to the expectile TD updates considered above.
-    In this case, the reversal point of a neuron $i$ should be $V_{\tau_i} \approx \epsilon_{\tau_i}$ (\Cref{fig:dist}B).
+    In this case, the reversal point of a neuron $i$ should be $V_{\tau_i} \approx \epsilon_{\tau_i}$ (\Cref{fig:dist}C).
     \item Neurons had different slopes describing the relationship between expected reward and firing rate in the regimes where expected reward was above and below the reversal point ($V_{\tau_i}$) of each neuron.
-    This is consistent with the algorithm described in \Cref{eq:DRL_V_expec} (\Cref{fig:dist}B).
+    This is consistent with the algorithm described in \Cref{eq:DRL_V_expec} (\Cref{fig:dist}C).
     \item When independently fitting a slope to the data above ($\alpha_i^+$) and below ($\alpha_i^-$) the reversal point of neuron $i$, the reversal point of the neuron was positively correlated with $\tau_i = \frac{\alpha_i^{+}}{\alpha_i^- + \alpha_i^+}$.
-    This is consistent with the expectile distributional RL setting, where the reversal point is $V_{\tau_i} \approx \epsilon_{\tau_i}$ (\Cref{fig:dist}B).
-    \item When `imputing' the distribution implied by the VTA neurons when interpreted as expectiles (\Cref{fig:dist}C), the resulting fit resembled the true distribution of rewards in the experiment.
+    This is consistent with the expectile distributional RL setting, where the reversal point is $V_{\tau_i} \approx \epsilon_{\tau_i}$ (\Cref{fig:dist}C).
+    \item When `imputing' the distribution implied by the VTA neurons when interpreted as expectiles (\Cref{fig:dist}D), the resulting fit resembled the true distribution of rewards in the experiment.
 \end{itemize}
 These findings generalize the canonical RPE view of \citet{schultz1997neural}, which can be seen as the averaged version of the theory put forward by \citet{dabney2020distributional}.
 The expectile regression algorithm investigated by \citet{dabney2020distributional} relies on non-local TD updates and non-linear `imputation' of the return distribution $p_{\{ V_{\tau_i} \} }(\tilde{Z}^\pi(s))$ induced by the learned expectiles $\{ V_{\tau_i}(s) \}$. 

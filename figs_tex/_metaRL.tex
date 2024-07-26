@@ -16,9 +16,10 @@
         Across episodes, the agent experiments with different actions and eventually converges on taking the optimal action.
         For episodes with more symmetric reward probabilities (near the middle), it takes longer for the agent to identify the optimal action.
         This balance between exploration and exploitation is mediated by the recurrent network dynamics, which are learned over many episodes using deep reinforcement learning.
-        {\bfseries (C)}~We averaged the hidden state of the RNN over 100 episodes for different reward probabilities, ranging from high reward for action 1 (blue) to low reward for action 1 (green), and performed PCA on the resulting matrix of average hidden states for different reward probabilities.
-        This figure shows the 2-dimensional embedding of neural activity in the meta-RL agent, which converges to different regions of state space for different reward probabilities.
-        Crosses indicate the hidden state at the beginning of each episode.
+        {\bfseries (C)}~We averaged the hidden state of the RNN over 100 episodes for each of several different reward probabilities, ranging from high reward for action 1 (blue) to low reward for action 1 (green)
+        We then performed PCA on the resulting matrix of average hidden states to compute a low-dimensional hidden state trajectory over the course of an episode for each reward probability.
+        This figure shows the 2-dimensional embedding of neural activity in the meta-RL agent, which converges to different regions of state space throughout the episode for different reward probabilities.
+        Black cross indicates the hidden state at the beginning of an episode, and coloured points indicate the final hidden state in an episode for the different reward probabilities.
         }
     \vspace*{-1.0em}
 \end{figure*}

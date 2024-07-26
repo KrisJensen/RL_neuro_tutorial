@@ -14,9 +14,11 @@
         States nearer the goal have higher value than those further away, although this is hard to distinguish on this color scale.
         {\bfseries (B)}~Empirical reward as a function of episode number for a TD-learning agent that acts according to \Cref{eq:value_action_selection} while updating its value estimates according to \Cref{eq:TD-learning}.
         For this agent, action selection assumes access to a `one-step' world model in order to evaluate the consequence of each putative action.
-        We see that the agent gradually converges to an optimal policy.
+        The agent gradually converges to an optimal policy.
         Parameters for the agent are as in (A), except that the start state is always the lower left corner.
-        {\bfseries (C)}~Value function learned by a greedy TD agent as in (B), plotted either early (top) or late (bottom) in training.
+        {\bfseries (C)}~TD error (\Cref{eq:TD-learning}) as a function of the step number along the optimal path for the agent in (B) at different stages of learning (green to blue).
+        This TD signal gradually propagates backwards from the reward to preceding states, mirroring biological recordings of dopamine activity \citep{schultz1997neural}.
+        {\bfseries (D)}~Value function learned by a greedy TD agent as in (B), plotted either early (top) or late (bottom) in training.
         Early in training, the agent has learned that the cliff is bad but doesn't know where the goal is or how to get there.
         Late in training, the agent has learned a value function that locally resembles the optimal value function from (A), while it has not learned the value of distant states that are rarely or never visited from the start state.
         This is a potential shortcoming of `greedy' agents that can easily converge to a sub-optimal local maximum in more complicated environments.

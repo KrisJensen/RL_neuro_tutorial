@@ -1,20 +1,24 @@
 \begin{figure*}[!t]
     \centering
     \vspace*{-0.5em}
-    \includegraphics[width=0.95\textwidth]{./figs/dist.pdf}
+    \includegraphics[width=1.0\textwidth]{./figs/dist_rev.pdf}
     \caption[Distributional]{\label{fig:dist}
         %
         {\bfseries Distributional reinforcement learning.}
-        The results in this figure reproduce some of the key simulations of \citet{dabney2020distributional}.
-        These simulations were all run on a simple value estimation task with a single state and no actions.
-        {\bfseries (A)}~Distribution of rewards (black), plotted together with the values $V_{\tau_i}$ converged to across 20 units all learning through standard TD learning (blue; all $\tau_i = 0.5$), or through distributional RL with different $\tau_i = \frac{\alpha_i^+}{\alpha_i^+ + \alpha_i^-}$ (green).
+        {\bfseries (B)}~Example of distributional RL improving representation learning.
+        Two states (e.g. `banana' and `lemon') may have the same expected reward but different reward distributions \emph{distributions} (top row).
+        A standard RL agent only has to predict the mean (black vertical lines) and may learn a simple feature like `yellow' that combines both states.
+        If the mean reward now changes for one state (bottom row), e.g. because the agent learned to make a banana smoothie, it may erroneously generalize to \emph{all} yellow fruits (bottom right; red line).
+        However, a distributional agent is forced to learn an initial representation that distinguishes the states, which can improve downstream learning and prevent overgeneralization (blue curves).
+        {\bfseries (B)}~Distributional RL simulations on a simple value estimation task with a single state and no actions, reproducing key ideas from \citet{dabney2020distributional}.
+        Distribution of rewards (black), plotted together with the values $V_{\tau_i}$ converged to across 20 units all learning through standard TD learning (orange; all $\tau_i = 0.5$), or through distributional RL with different $\tau_i = \frac{\alpha_i^+}{\alpha_i^+ + \alpha_i^-}$ (blue).
         The TD units all converge to the mean reward, while the expectile units end up tiling the distribution.
-        {\bfseries (B)}~For both the TD units and distributional units from (A), we plot the temporal difference updates performed in response to different rewards from the reward distribution.
+        {\bfseries (C)}~For both the TD units and distributional units from (B), we plot the temporal difference updates performed in response to different rewards from the reward distribution.
         These updates have been proposed to be represented in the firing rates of dopaminergic VTA neurons relative to baseline \citep{schultz1997neural,dabney2020distributional}.
         The TD units show a constant linear scaling across positive and negative rewards, while the distributional units show an asymmetric scaling of firing rate with reward magnitude above and below their reversal point (black horizontal line).
         The ratio of slopes above and below the reversal point scales positively with the value of the reversal point.
         These features of dopaminergic VTA neurons were used by \citet{dabney2020distributional} to argue that the brain implements a form of distributional RL.
-        {\bfseries (C)}~True reward distribution (black) reproduced from (A), now plotted together with the reward distribution $p_{\{ V_{\tau_i} \} }(\tilde{Z}^\pi(s))$ implied by the distributional units from (A) and (B) at different stages of learning (light to dark green).
+        {\bfseries (D)}~True reward distribution (black) reproduced from (B), now plotted together with the reward distribution $p_{\{ V_{\tau_i} \} }(\tilde{Z}^\pi(s))$ implied by the distributional units from (B) and (C) at different stages of learning (green to blue).
         These imputed distributions were computed by \emph{assuming} that the value $V_{\tau_i}$ learned by unit $i$ corresponds to expectile $\tau_i = \frac{\alpha_i^+}{\alpha_i^+ + \alpha_i^-}$ of the reward distribution.
         We then impute the distribution implied by these expectiles under the assumption that it consists of a set of $N$ delta functions in the case of $N$ expectiles \citep{rowland2019statistics}.
         Finally, we convolved the resulting delta functions with a Gaussian kernel ($\sigma = 0.1$) for visualization.
